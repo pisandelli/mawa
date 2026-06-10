@@ -1,0 +1,55 @@
+# Example MAWA manifest. Copy to the project root as `.mawa-config.yaml` and adjust.
+# Schema and field meanings: workflow/mawa-config.schema.md
+
+mawa:
+  project_name: "acme-dashboard"
+  human_language: "pt-BR"
+  artifact_language: "en"
+  interaction_mode: "interactive" # interactive | continuous
+  execution_mode: "ide" # ide | web
+
+state:
+  current_stage: "00-project-init" # next pending Stage ID; see workflow/orchestration.md
+  completed_stages: [] # e.g. ["00-project-init", "01-project-briefing"]
+  active_module: null # object during module stages; null outside module work
+  # Example during module work:
+  # active_module:
+  #   name: "billing"
+  #   implementation_path: null # 06 | 06a | null
+  #   design_handoff: null # used | skipped | null
+
+core:
+  framework: "nuxt4"
+  package_manager: "pnpm"
+  state_management: "pinia"
+  template_language: "pug" # pug | html
+
+ui:
+  adapter: "daredash"
+  docs:
+    source_url: "https://raw.githubusercontent.com/pisandelli/daredash/main/llms.txt"
+    load_from: "url" # fetch/load from source_url when required
+    cache: "session" # reuse only while available in the current session
+    required: true
+  config:
+    prefix: "dd"
+    debug: false
+    tokens_path: null
+  setup_status: "pending" # pending | confirmed | skipped
+
+design:
+  enabled: true # false skips the design phase; the agent structures UI from spec + adapter docs
+  adapter: "pencil"
+  mcp_required: true
+  mcp_status: "unknown" # preconfigured | missing | unknown — do not assume preconfigured
+  handoff_required: true
+  setup_status: "pending" # pending | confirmed | skipped
+
+paths:
+  raw_briefing: "inputs/raw-briefing.md"
+  project_briefing: "specs/briefing/project-briefing.md"
+  discovery_spec: "specs/discovery/discovery.spec.md"
+  domain_map: "specs/domain/domain-map.md"
+  module_specs: "specs/modules"
+  approved_layouts: "specs/layouts"
+  reviews: "specs/reviews"

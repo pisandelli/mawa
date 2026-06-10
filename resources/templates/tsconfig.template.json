@@ -1,0 +1,4 @@
+{
+  "//": "MAWA root tsconfig. Required: `nuxi typecheck` fails without a root tsconfig (error: 'Cannot find matching tsconfig.json'). Extends the one Nuxt generates in .nuxt/ after `nuxi prepare`.",
+  "extends": "./.nuxt/tsconfig.json"
+}

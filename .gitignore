@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Nuxt build artifacts (in case a MAWA project is scaffolded inside)
+.nuxt/
+.output/
+dist/
+.data/
+
+# Env & local
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+*.log

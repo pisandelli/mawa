@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -m 15 https://raw.githubusercontent.com/pisandelli/daredash/main/llms.txt)",
+      "Bash(npm view *)",
+      "Bash(curl -sI -m 8 https://raw.githubusercontent.com/pisandelli/daredash/main/llms.txt)"
+    ]
+  }
+}
