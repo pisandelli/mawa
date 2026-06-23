@@ -38,10 +38,10 @@ Default mode is `interactive`.
 
 - Ask before advancing stages.
 - Ask before implementation.
-- Ask before destructive or setup actions.
+- Ask before destructive or Tier 2 setup actions; the fixed baseline is auto-applied in `ide` mode and reported (`workflow/setup-policy.md`).
 - Do not ask for non-blocking details; proceed with documented assumptions when safe.
 
-`continuous` mode may proceed through non-destructive stages when assumptions are safe, but still must not silently install dependencies or modify setup files unless explicitly allowed.
+`continuous` mode may proceed through non-destructive stages when assumptions are safe, but still must not install or modify setup silently or beyond the fixed baseline.
 
 ## 4. Nuxt 4 Architecture
 

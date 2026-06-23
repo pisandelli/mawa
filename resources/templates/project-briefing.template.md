@@ -83,6 +83,13 @@
 
 - [Question]
 
-## 18. Discovery Readiness Assessment
+## 18. Risks and Gaps
+
+Bottlenecks, technical risks, vague UX, integration unknowns, and unclear ownership
+surfaced during the briefing interview.
+
+- [Risk or gap] — [impact / why it matters]
+
+## 19. Discovery Readiness Assessment
 
 Ready / Needs clarification

@@ -54,6 +54,7 @@ design:
   setup_status: "pending" # pending | confirmed | skipped
 
 paths:
+  app_root: "./web" # Nuxt application root; setup + implementation happen here. Use "." to keep the app at the repo root. Avoid "./app" (collides with Nuxt's app/ srcDir).
   raw_briefing: "inputs/raw-briefing.md"
   project_briefing: "specs/briefing/project-briefing.md"
   discovery_spec: "specs/discovery/discovery.spec.md"
@@ -76,3 +77,7 @@ paths:
   - `design.setup_status` / `design.mcp_status` — readiness of the design tooling.
   - `state.active_module.design_handoff` — the actual per-module outcome (`used` / `skipped`), and the source of truth for what happened to a given module.
 - `design.enabled = false` skips Stage 05a; implementation runs through Stage 06.
+- `paths.app_root` is the Nuxt application root. All dependency installs, config files
+  (`nuxt.config.ts`, `tsconfig.json`, `package.json`), and implementation code are
+  created **inside** it. MAWA workflow files and the `specs/` artifacts stay at the MAWA
+  root, separate from the application.

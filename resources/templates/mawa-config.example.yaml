@@ -46,6 +46,7 @@ design:
   setup_status: "pending" # pending | confirmed | skipped
 
 paths:
+  app_root: "./web" # Nuxt application root; setup + implementation happen here. "." = repo root. Avoid "./app" (Nuxt srcDir collision).
   raw_briefing: "inputs/raw-briefing.md"
   project_briefing: "specs/briefing/project-briefing.md"
   discovery_spec: "specs/discovery/discovery.spec.md"

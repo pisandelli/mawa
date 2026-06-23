@@ -1,5 +1,6 @@
 // MAWA Nuxt 4 base template.
-// This file contains only global MAWA defaults.
+// This file contains only global MAWA defaults + the pre-configured baseline modules
+// (@nuxt/eslint, @vueuse/nuxt, @pinia/nuxt).
 // UI adapters must be installed and configured manually using their setup guides.
 //
 // Layer imports use Nuxt's native alias `@/` (→ srcDir `app/`):
@@ -11,8 +12,14 @@
 
 export default defineNuxtConfig({
   modules: [
+    '@nuxt/eslint',
+    '@vueuse/nuxt',
     '@pinia/nuxt',
   ],
+
+  // @nuxt/eslint generates a flat config at .nuxt/eslint.config.mjs (consumed by the
+  // root eslint.config.mjs via withNuxt). See resources/templates/eslint.config.template.mjs.
+  eslint: {},
 
   typescript: {
     strict: true,

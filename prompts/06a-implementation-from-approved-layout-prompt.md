@@ -18,12 +18,14 @@ Use this stage when `design.enabled = true` and an approved layout exists.
 
 ## Output
 
-- code changes in the Nuxt 4 project
+- code changes in the Nuxt 4 project (under `paths.app_root`)
 - implementation summary
 - explicit TODOs for unresolved layout/spec conflicts
 
 ## Rules
 
+- Write all application code inside `paths.app_root` from `.mawa-config.yaml`. Never
+  create app files at the MAWA root.
 - Preserve business rules from the module spec.
 - Preserve approved layout intent.
 - Prefer UI adapter components over custom CSS.

@@ -1,4 +1,10 @@
 {
-  "//": "MAWA root tsconfig. Required: `nuxi typecheck` fails without a root tsconfig (error: 'Cannot find matching tsconfig.json'). Extends the one Nuxt generates in .nuxt/ after `nuxi prepare`.",
-  "extends": "./.nuxt/tsconfig.json"
+  "//": "MAWA root tsconfig (Nuxt 4). A root tsconfig is required or `nuxi typecheck` cannot resolve auto-imported globals (e.g. error: Cannot find name 'ref'/'useState'). Nuxt 4 uses TypeScript project references: `nuxi prepare` generates the four .nuxt/tsconfig.*.json files referenced below. Do NOT use the Nuxt 3 pattern `extends: ./.nuxt/tsconfig.json` — it breaks typecheck in Nuxt 4. Customize via nuxt.config.ts, not here.",
+  "files": [],
+  "references": [
+    { "path": "./.nuxt/tsconfig.app.json" },
+    { "path": "./.nuxt/tsconfig.server.json" },
+    { "path": "./.nuxt/tsconfig.shared.json" },
+    { "path": "./.nuxt/tsconfig.node.json" }
+  ]
 }

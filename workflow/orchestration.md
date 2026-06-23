@@ -113,4 +113,4 @@ The design phase (05a) always stops for the human regardless of interaction mode
 an external, human-driven activity. Continuous mode still resumes automatically once the
 approved-layout artifact is present.
 
-Neither mode silently installs dependencies or modifies setup files unless explicitly allowed by the human.
+Neither mode installs or modifies setup silently or beyond the fixed baseline. The fixed baseline is auto-applied and reported in `ide` mode; everything else stays confirm-first (`workflow/setup-policy.md`).

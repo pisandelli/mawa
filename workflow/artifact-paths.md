@@ -2,6 +2,16 @@
 
 MAWA uses fixed artifact paths to avoid ambiguity.
 
+## Two roots
+
+- **MAWA root** — workflow files (`prompts/`, `governance/`, `adapters/`, `dna/`,
+  `workflow/`, `resources/`) and the generated artifacts below (`inputs/`, `specs/`).
+- **Application root** — `paths.app_root` from `.mawa-config.yaml`. The Nuxt application
+  (code, `nuxt.config.ts`, `tsconfig.json`, `package.json`) lives here, separate from the
+  workflow. Setup (02) and implementation (06/06a) operate strictly inside it.
+
+The paths below are relative to the MAWA root.
+
 ## Input seed
 
 ```text

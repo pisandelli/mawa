@@ -63,7 +63,7 @@ Every data-driven experience must visibly handle:
 
 ## 6. Setup Boundary
 
-MAWA does not silently install dependencies or modify project configuration files during environment setup. Setup instructions may include commands and suggested snippets, but the human must confirm completion unless they explicitly ask MAWA to apply changes.
+MAWA never installs dependencies or modifies setup files silently or beyond the fixed baseline. Two tiers (see `workflow/setup-policy.md`): the **fixed baseline** (Nuxt scaffold, `@pinia/nuxt`, `@nuxt/eslint` + `eslint`, `@vueuse/nuxt`, `pug` when configured, and their config files) may be installed and configured automatically in `ide` mode but must be clearly reported afterward; **everything else** is confirm-first — commands and snippets provided, human confirms, applied automatically only on explicit request.
 
 ## 7. Verification
 

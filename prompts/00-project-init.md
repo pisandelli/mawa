@@ -29,9 +29,15 @@ Act as the MAWA workflow coordinator.
    - interactive mode
    - DareDash UI adapter by default
    - Pencil design adapter by default
-5. Initialize the `state` block in `.mawa-config.yaml`. While Stage 00 is running, `current_stage` may be `00-project-init`; once Stage 00 passes its Definition of Done, update `completed_stages` with `00-project-init` and set `current_stage: "01-project-briefing"`. Keep `active_module: null`.
-6. Do not perform environment setup yet.
-7. Do not generate the Project Briefing yet unless explicitly continuing to stage 01.
+5. Confirm the application directory and record it as `paths.app_root`. Ask the human:
+   > In which directory should the Nuxt application be created? (default `./web`; use `.` to build at the repo root)
+
+   This keeps the application separate from the MAWA workflow files. Do not use `./app`
+   (it collides with Nuxt's `app/` srcDir). All later setup and implementation happen
+   inside `paths.app_root`.
+6. Initialize the `state` block in `.mawa-config.yaml`. While Stage 00 is running, `current_stage` may be `00-project-init`; once Stage 00 passes its Definition of Done, update `completed_stages` with `00-project-init` and set `current_stage: "01-project-briefing"`. Keep `active_module: null`.
+7. Do not perform environment setup yet.
+8. Do not generate the Project Briefing yet unless explicitly continuing to stage 01.
 
 ## Human interaction
 
@@ -50,6 +56,7 @@ Do not emit the completion message until all are true:
 
 - [ ] `.mawa-config.yaml` exists with all required keys from the schema.
 - [ ] `state` block is valid, with `active_module: null`.
+- [ ] `paths.app_root` is set (application directory confirmed with the human).
 - [ ] Raw Briefing location confirmed (`inputs/raw-briefing.md`).
 - [ ] MAWA defaults confirmed or explicitly overridden.
 - [ ] Stage completion state update is ready: `completed_stages` includes `00-project-init` and `current_stage` points to `01-project-briefing`.

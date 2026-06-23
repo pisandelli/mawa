@@ -117,12 +117,18 @@ These hold in every stage, in every interaction mode (`governance/core-rules.md`
 - **Language:** chat with the human in `human_language`; write code, filenames,
   comments, specs, and technical docs in English; preserve target locale only for
   user-facing UI copy.
-- **Setup safety:** never silently install dependencies or modify config files.
-  Provide commands and snippets, ask the human to confirm, record status. Modify setup
-  files only when explicitly asked.
+- **Setup safety:** never install or modify setup silently or beyond the fixed baseline.
+  The fixed baseline (Nuxt scaffold, `@pinia/nuxt`, `@nuxt/eslint` + `eslint`,
+  `@vueuse/nuxt`, `pug` when configured, and their config files) may be auto-applied in
+  `ide` mode but must be reported afterward. Everything else is confirm-first: provide
+  commands and snippets, ask the human to confirm, apply only on explicit request
+  (`workflow/setup-policy.md`).
 - **Architecture:** `API → Store → Component/Page`. Components never call API modules
   directly. Stores own business state and `{ data, loading, error }`.
 - **Specs before code:** no module code before its module spec is approved.
+- **Application location:** the Nuxt app is created and modified strictly inside
+  `paths.app_root` from `.mawa-config.yaml`. Never scaffold app code, configs, or
+  dependencies at the MAWA root. Workflow files and `specs/` stay at the MAWA root.
 - **Adapters:** use the selected UI/design adapter docs as the source of truth. Never
   invent component APIs.
 

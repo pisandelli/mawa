@@ -16,12 +16,14 @@ Implement one approved module spec without an approved visual layout handoff.
 
 ## Output
 
-- code changes in the Nuxt 4 project
+- code changes in the Nuxt 4 project (under `paths.app_root`)
 - explicit TODOs for unresolved dependencies
 - implementation summary
 
 ## Rules
 
+- Write all application code inside `paths.app_root` from `.mawa-config.yaml`. Never
+  create app files at the MAWA root.
 - Do not redesign the module.
 - Do not silently change setup/config files unless explicitly requested.
 - Follow API → Store → Component/Page.

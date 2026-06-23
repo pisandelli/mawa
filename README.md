@@ -23,6 +23,12 @@ Default stack:
 - Pencil design adapter
 - interactive mode
 
+Pre-configured baseline modules (installed and wired into `nuxt.config.ts` in every project):
+
+- `@nuxt/eslint` + `eslint` (flat config via `eslint.config.mjs`)
+- `@vueuse/nuxt`
+- `@pinia/nuxt`
+
 ---
 
 ## Status — Beta (`0.1.0-beta.1`)
@@ -151,20 +157,26 @@ mawa/
 
 ---
 
+## Application Location
+
+The Nuxt application is kept separate from the workflow files. Its directory is set in
+`.mawa-config.md` as `paths.app_root` (default `./web`, asked during Stage 00). All setup
+and implementation happen inside it; MAWA's workflow files and `specs/` stay at the root.
+Use `.` to build the app at the repo root. Avoid `./app` — it collides with Nuxt 4's
+`app/` srcDir.
+
 ## Setup Policy
 
-MAWA does not silently install dependencies or modify project configuration files during setup.
+MAWA never installs or modifies setup silently or beyond the fixed baseline. Two tiers
+(full detail in `workflow/setup-policy.md`):
 
-During setup, MAWA must:
-
-- identify required dependencies;
-- provide install commands;
-- provide suggested configuration snippets;
-- explain adapter-specific decisions;
-- ask the human to confirm when setup is complete;
-- record confirmed setup status in `.mawa-config.yaml`.
-
-MAWA may only modify setup files automatically when the human explicitly asks it to do so.
+- **Fixed baseline — auto-applied, always reported.** In `ide` mode MAWA installs and
+  configures the baseline (Nuxt scaffold, `@pinia/nuxt`, `@nuxt/eslint` + `eslint`,
+  `@vueuse/nuxt`, `pug` when configured, and their config files) without asking, then
+  clearly reports the commands run, packages added, and files changed.
+- **Everything else — confirm-first.** UI adapter packages, the optional test toolchain,
+  design tooling, and any choice-bearing dependency: MAWA provides commands and snippets,
+  the human confirms, and MAWA applies them automatically only on explicit request.
 
 ---
 

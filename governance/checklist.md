@@ -18,8 +18,8 @@ Run this checklist before marking any MAWA task complete.
 
 ## Setup Safety
 
-- [ ] No dependencies were installed silently.
-- [ ] No config files were modified silently.
+- [ ] Fixed-baseline auto-install/config was reported (commands, packages, files changed).
+- [ ] No Tier 2 dependencies were installed without confirmation; no config changed silently.
 - [ ] Any destructive action was explicitly approved.
 - [ ] Manual setup status was recorded or requested.
 
@@ -33,6 +33,7 @@ Run this checklist before marking any MAWA task complete.
 ## Quality
 
 - [ ] TypeScript types are strict and intentional.
+- [ ] ESLint passes (or failures are documented); the baseline `@nuxt/eslint` config is in place.
 - [ ] Tests are present or missing tests are documented.
 - [ ] Assumptions and blockers are documented.
 - [ ] Review output is saved to the configured review path when applicable.
