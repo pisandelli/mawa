@@ -14,7 +14,7 @@ It must then **clearly report what it did**. The baseline is:
 
 - the Nuxt 4 scaffold, if the application does not exist yet;
 - `@pinia/nuxt`, `@nuxt/eslint` + `eslint`, `@vueuse/nuxt`;
-- `pug` when `core.template_language` is `pug`;
+- when `core.template_language` is `pug`: `pug`, `@types/pug`, `@vue/language-plugin-pug`, and the matching `nuxt.config.ts` Vue compiler plugin configuration;
 - the baseline config files: `nuxt.config.ts`, `tsconfig.json`, `eslint.config.mjs`.
 
 After applying the baseline, MAWA must report: the commands it ran, the packages added

@@ -172,8 +172,10 @@ MAWA never installs or modifies setup silently or beyond the fixed baseline. Two
 
 - **Fixed baseline — auto-applied, always reported.** In `ide` mode MAWA installs and
   configures the baseline (Nuxt scaffold, `@pinia/nuxt`, `@nuxt/eslint` + `eslint`,
-  `@vueuse/nuxt`, `pug` when configured, and their config files) without asking, then
-  clearly reports the commands run, packages added, and files changed.
+  `@vueuse/nuxt`, and when `template_language` is `pug`: `pug`, `@types/pug`,
+  `@vue/language-plugin-pug`, plus the corresponding `nuxt.config.ts` Vue compiler
+  plugin setup) without asking, then clearly reports the commands run, packages added,
+  and files changed.
 - **Everything else — confirm-first.** UI adapter packages, the optional test toolchain,
   design tooling, and any choice-bearing dependency: MAWA provides commands and snippets,
   the human confirms, and MAWA applies them automatically only on explicit request.

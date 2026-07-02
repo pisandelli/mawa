@@ -119,10 +119,11 @@ These hold in every stage, in every interaction mode (`governance/core-rules.md`
   user-facing UI copy.
 - **Setup safety:** never install or modify setup silently or beyond the fixed baseline.
   The fixed baseline (Nuxt scaffold, `@pinia/nuxt`, `@nuxt/eslint` + `eslint`,
-  `@vueuse/nuxt`, `pug` when configured, and their config files) may be auto-applied in
-  `ide` mode but must be reported afterward. Everything else is confirm-first: provide
-  commands and snippets, ask the human to confirm, apply only on explicit request
-  (`workflow/setup-policy.md`).
+  `@vueuse/nuxt`, and when `template_language` is `pug`: `pug`, `@types/pug`,
+  `@vue/language-plugin-pug`, plus the matching `nuxt.config.ts` Vue compiler plugin
+  setup) may be auto-applied in `ide` mode but must be reported afterward. Everything
+  else is confirm-first: provide commands and snippets, ask the human to confirm, apply
+  only on explicit request (`workflow/setup-policy.md`).
 - **Architecture:** `API → Store → Component/Page`. Components never call API modules
   directly. Stores own business state and `{ data, loading, error }`.
 - **Specs before code:** no module code before its module spec is approved.

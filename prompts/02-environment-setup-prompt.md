@@ -43,7 +43,11 @@ separate from the application.
    - the Nuxt 4 scaffold, if the application does not exist yet (`pnpm create nuxt@latest <app_root>`);
    - `pnpm add @vueuse/nuxt` (dependency);
    - `pnpm add -D eslint @nuxt/eslint` (devDependencies);
-   - `pnpm add -D pug` when `core.template_language` is `pug`;
+     - when `core.template_language` is `pug`:
+     - `pnpm add pug` (dependency);
+     - `pnpm add -D @types/pug @vue/language-plugin-pug` (devDependencies);
+     - update `nuxt.config.ts` so `typescript.tsConfig.vueCompilerOptions.plugins` adds
+       `@vue/language-plugin-pug` without removing Nuxt's existing defaults;
    - `nuxt.config.ts` from `resources/templates/nuxt.config.template.ts` (modules already
      wired: `['@nuxt/eslint', '@vueuse/nuxt', '@pinia/nuxt']`);
    - root `tsconfig.json` from `resources/templates/tsconfig.template.json` (Nuxt 4 project
@@ -75,7 +79,7 @@ snippets, do not auto-apply unless explicitly asked. Never act silently. Full po
 Do not emit the completion message until all are true:
 
 - [ ] Everything targeted `paths.app_root`, not the MAWA root.
-- [ ] Fixed baseline applied (`ide`) or commands provided (`web`): Nuxt scaffold, `@pinia/nuxt` + `@nuxt/eslint` + `eslint` + `@vueuse/nuxt`, `pug` when configured, and `nuxt.config.ts` / `tsconfig.json` / `eslint.config.mjs`.
+- [ ] Fixed baseline applied (`ide`) or commands provided (`web`): Nuxt scaffold, `@pinia/nuxt` + `@nuxt/eslint` + `eslint` + `@vueuse/nuxt`, Pug runtime + language tooling when configured, and `nuxt.config.ts` / `tsconfig.json` / `eslint.config.mjs`.
 - [ ] Baseline application was reported (commands run, packages added, files changed).
 - [ ] Tier 2 items (UI adapter, test toolchain, design tooling) presented, not auto-applied unless explicitly requested.
 - [ ] Selected UI operational docs loaded from `ui.docs.source_url` or requested from the human when required.

@@ -45,8 +45,15 @@ plan.
 ## Setup
 
 Present install commands and config snippets for Nuxt 4 + the selected adapter. If
-`template_language` is `pug`, include `pnpm add -D pug`. Never install or modify config
-silently — ask the human to confirm completion (see `workflow/setup-policy.md`).
+`template_language` is `pug`, include:
+
+- `pnpm add pug`
+- `pnpm add -D @types/pug @vue/language-plugin-pug`
+- a `nuxt.config.ts` update so `typescript.tsConfig.vueCompilerOptions.plugins` adds
+  `@vue/language-plugin-pug` without removing Nuxt's existing defaults
+
+Never install or modify config silently — ask the human to confirm completion (see
+`workflow/setup-policy.md`).
 
 ## Implementation
 
