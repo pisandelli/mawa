@@ -31,7 +31,7 @@ Pre-configured baseline modules (installed and wired into `nuxt.config.ts` in ev
 
 ---
 
-## Status — Beta (`0.1.0-beta.1`)
+## Status — Beta (`0.1.0-beta.3`)
 
 MAWA is in **public beta**. The stage flow is validated end-to-end and the core is
 internally consistent, but expect rough edges and breaking changes between betas.
