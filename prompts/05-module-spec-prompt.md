@@ -58,11 +58,15 @@ active_module:
   design_handoff: null
 ```
 
-Then update `state.current_stage` to `05a-design-handoff` or `06-implementation` according to the selected path.
+Update the module row in `specs/domain/module-plan.md` to `spec: approved`. In
+`module-by-module`, then update `state.current_stage` to `05a-design-handoff` or
+`06-implementation` according to the selected path. In `phase-by-phase`, return to
+`05-module-spec` for the next pending module; only after every spec passes may the design
+or implementation phase begin.
 
 ## Stage completion message
 
-If `design.enabled = true` (the design phase is optional — offer both paths):
+In `module-by-module`, if `design.enabled = true` (the design phase is optional — offer both paths):
 
 > Module Spec is ready. Do you want to run Stage 05a — Design Handoff (approve a layout in the design tool first), or skip design and go straight to Stage 06 — Implementation?
 

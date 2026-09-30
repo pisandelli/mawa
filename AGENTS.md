@@ -44,6 +44,7 @@ block is absent or stale.
   → (optional) 05a Design Handoff   ← standby on the design tool until layout approved
   → 06 Implementation  OR  06a Implementation From Approved Layout
   → 07 Review & Validation
+  → 08 Project Delivery
 ```
 
 The design phase (`05a`) is **optional**. See `workflow/orchestration.md` for the
@@ -96,6 +97,7 @@ Use this table when resolving `state.current_stage` to a protocol file.
 | `06-implementation` | `prompts/06-implementation-prompt.md` |
 | `06a-implementation-from-approved-layout` | `prompts/06a-implementation-from-approved-layout-prompt.md` |
 | `07-review-validation` | `prompts/07-review-validation-prompt.md` |
+| `08-project-delivery` | `prompts/08-project-delivery-prompt.md` |
 
 `state.current_stage` must always be one of these Stage IDs.
 

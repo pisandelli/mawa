@@ -117,6 +117,15 @@ Load:
 - selected design adapter handoff, if applicable
 - relevant DNA files
 
+## 08 Project Delivery
+
+Load:
+
+- `.mawa-config.yaml`
+- `specs/domain/module-plan.md`
+- all module reviews
+- `resources/templates/project-delivery-checklist.template.md`
+
 
 ## Adapter operational docs rule
 

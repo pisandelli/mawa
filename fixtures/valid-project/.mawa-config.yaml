@@ -1,0 +1,12 @@
+mawa:
+  project_name: "reference"
+  human_language: "en"
+  artifact_language: "en"
+  interaction_mode: "interactive"
+  execution_mode: "ide"
+state:
+  current_stage: "05-module-spec"
+  completed_stages: ["00-project-init", "01-project-briefing", "02-environment-setup", "03-discovery", "04-domain-architecture"]
+  active_module: null
+workflow:
+  module_flow: "phase-by-phase"

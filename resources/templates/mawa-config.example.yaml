@@ -18,6 +18,9 @@ state:
   #   implementation_path: null # 06 | 06a | null
   #   design_handoff: null # used | skipped | null
 
+workflow:
+  module_flow: "module-by-module" # module-by-module | phase-by-phase
+
 core:
   framework: "nuxt4"
   package_manager: "pnpm"

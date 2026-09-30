@@ -14,6 +14,7 @@ Transform the Discovery Spec into a domain architecture map.
 ## Output
 
 - `specs/domain/domain-map.md`
+- `specs/domain/module-plan.md` from `resources/templates/module-plan.template.md`
 
 ## Role
 
@@ -43,9 +44,10 @@ Do not emit the completion message until all are true:
 - [ ] Sections 1–12 are present in `specs/domain/domain-map.md`.
 - [ ] Bounded contexts, entity ownership, and forbidden couplings are defined.
 - [ ] Module specification candidates are listed for Stage 05.
+- [ ] The ordered module plan exists and declares the configured flow mode.
 
 ## Stage completion message
 
 End with:
 
-> Domain Map is ready at `specs/domain/domain-map.md`. Which module should Stage 05 specify first?
+> Domain Map and delivery plan are ready. Which planned module should Stage 05 specify first?

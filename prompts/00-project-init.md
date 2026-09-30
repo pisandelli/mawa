@@ -21,8 +21,10 @@ Act as the MAWA workflow coordinator.
 
 1. Check whether `inputs/raw-briefing.md` exists.
 2. If the human provided the raw idea in chat and the file does not exist: in `ide` execution mode, offer to write it to `inputs/raw-briefing.md` yourself (writing a seed file is not a destructive setup action); in `web` mode, instruct the human to save it there.
-3. Create or update `.mawa-config.yaml` according to `workflow/mawa-config.schema.md`, including the `state` block (`current_stage`, `completed_stages`, `active_module`). Use `resources/templates/mawa-config.example.yaml` as the starting point.
-4. Confirm the MAWA defaults unless already configured:
+3. Run a short, progressive configuration interview before writing a new manifest. Ask one question at a time: confirm project name when it cannot be inferred; confirm `paths.app_root`; then ask whether to keep defaults or customize. Customization may select UI adapter, design adapter/skip, template language, and `workflow.module_flow`.
+4. Present a readable summary of every value that will be written and obtain explicit approval before creating or changing `.mawa-config.yaml` in `interactive` mode. For an existing manifest, show the changed values. In `continuous` mode record safe defaults and still present the summary when a material choice was not inferable.
+5. Create or update `.mawa-config.yaml` according to `workflow/mawa-config.schema.md`, including the `state` block (`current_stage`, `completed_stages`, `active_module`). Use `resources/templates/mawa-config.example.yaml` as the starting point.
+6. Confirm the MAWA defaults unless already configured:
    - Nuxt 4
    - pnpm
    - Pinia
@@ -59,6 +61,7 @@ Do not emit the completion message until all are true:
 - [ ] `paths.app_root` is set (application directory confirmed with the human).
 - [ ] Raw Briefing location confirmed (`inputs/raw-briefing.md`).
 - [ ] MAWA defaults confirmed or explicitly overridden.
+- [ ] The proposed manifest summary was approved before a new or changed manifest was written in interactive mode.
 - [ ] Stage completion state update is ready: `completed_stages` includes `00-project-init` and `current_stage` points to `01-project-briefing`.
 
 ## Stage completion message

@@ -49,7 +49,7 @@ Known limitations (read before adopting):
 - **The full design path is unproven.** The optional `05a` design handoff (with a live
   design-tool MCP such as Pencil) has not been exercised end-to-end; the skip path has.
 
-What *is* validated: the boot → 00–07 flow, state resume, stage-ID resolution, the
+What *is* validated: the boot → 00–08 flow, state resume, stage-ID resolution, the
 DoD gates, the source-URL adapter docs, and a generated module that type-checks and
 unit-tests clean against real Nuxt 4 + `@pisandelli/daredash`.
 
@@ -160,7 +160,7 @@ mawa/
 ## Application Location
 
 The Nuxt application is kept separate from the workflow files. Its directory is set in
-`.mawa-config.md` as `paths.app_root` (default `./web`, asked during Stage 00). All setup
+`.mawa-config.yaml` as `paths.app_root` (default `./web`, asked during Stage 00). All setup
 and implementation happen inside it; MAWA's workflow files and `specs/` stay at the root.
 Use `.` to build the app at the repo root. Avoid `./app` — it collides with Nuxt 4's
 `app/` srcDir.

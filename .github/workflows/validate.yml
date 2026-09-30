@@ -1,0 +1,19 @@
+name: Validate MAWA
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+      - run: npm run validate -- fixtures/valid-project
+      - name: Reject an invalid fixture
+        run: '! npm run validate -- fixtures/invalid-missing-manifest'

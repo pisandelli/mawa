@@ -1,0 +1,16 @@
+{
+  "name": "mawa",
+  "version": "0.1.0-beta.3",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "mawa": "bin/mawa.mjs"
+  },
+  "scripts": {
+    "validate": "node bin/mawa.mjs validate",
+    "test": "node --test test/**/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}

@@ -48,8 +48,11 @@ separate from the application.
      - `pnpm add -D @types/pug @vue/language-plugin-pug` (devDependencies);
      - update `nuxt.config.ts` so `typescript.tsConfig.vueCompilerOptions.plugins` adds
        `@vue/language-plugin-pug` without removing Nuxt's existing defaults;
-   - `nuxt.config.ts` from `resources/templates/nuxt.config.template.ts` (modules already
-     wired: `['@nuxt/eslint', '@vueuse/nuxt', '@pinia/nuxt']`);
+   - `nuxt.config.ts` from `resources/templates/nuxt.config.template.ts`, replacing
+     `{{COMPATIBILITY_DATE}}` with the local creation date (`YYYY-MM-DD`). Never leave the
+     placeholder in the generated file, never use a dynamic `new Date()` expression, and
+     preserve an existing `compatibilityDate` unless its change is explicitly approved;
+     modules are wired: `['@nuxt/eslint', '@vueuse/nuxt', '@pinia/nuxt']`;
    - root `tsconfig.json` from `resources/templates/tsconfig.template.json` (Nuxt 4 project
      references — NOT the Nuxt 3 `extends` pattern; without it `nuxi typecheck` cannot
      resolve auto-imported globals, e.g. `Cannot find name 'ref'`);
@@ -61,7 +64,7 @@ separate from the application.
 
 6. Present any remaining UI-adapter-specific install commands and configuration snippets,
    and explain adapter-specific decisions.
-7. If tests are planned, present the test toolchain: `pnpm add -D @nuxt/test-utils vitest@^3 happy-dom` and a `vitest.config.ts` from `resources/templates/vitest.config.template.ts`. Note: Nuxt 4 requires Vitest 3+; plain Vitest fails on MAWA stores with `ReferenceError: ref is not defined`.
+7. If tests are planned, inspect the selected `@nuxt/test-utils` peer range and present a compatible current Vitest, DOM environment, `vue-tsc`, and TypeScript matrix. Use the Nuxt test template; plain Vitest without the Nuxt environment fails on MAWA stores with `ReferenceError: ref is not defined`. Run both `nuxi typecheck` and tests before calling the matrix supported.
 8. Remind the human that design MCP/tooling must already be configured externally. If the design MCP is unavailable, the human may set `design.enabled: false` (skip design globally) or skip per module at Stage 05a.
 9. Verify that selected UI operational docs can be loaded from `ui.docs.source_url` when needed. If they are not available in the current session, load them from the URL or, in `web` mode when fetching is unavailable, ask the human to provide the current content. Do not commit a local copy by default.
 10. Apply Tier 2 items automatically only if the human explicitly asks; otherwise ask the human to confirm completion.
@@ -80,6 +83,7 @@ Do not emit the completion message until all are true:
 
 - [ ] Everything targeted `paths.app_root`, not the MAWA root.
 - [ ] Fixed baseline applied (`ide`) or commands provided (`web`): Nuxt scaffold, `@pinia/nuxt` + `@nuxt/eslint` + `eslint` + `@vueuse/nuxt`, Pug runtime + language tooling when configured, and `nuxt.config.ts` / `tsconfig.json` / `eslint.config.mjs`.
+- [ ] New `nuxt.config.ts` has a literal, valid `compatibilityDate`; no template placeholder remains.
 - [ ] Baseline application was reported (commands run, packages added, files changed).
 - [ ] Tier 2 items (UI adapter, test toolchain, design tooling) presented, not auto-applied unless explicitly requested.
 - [ ] Selected UI operational docs loaded from `ui.docs.source_url` or requested from the human when required.
