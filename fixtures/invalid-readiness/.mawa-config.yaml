@@ -1,0 +1,12 @@
+mawa:
+  project_name: "invalid"
+  human_language: "en"
+  artifact_language: "en"
+  interaction_mode: "interactive"
+  execution_mode: "ide"
+state:
+  current_stage: "06-implementation"
+  active_module:
+    name: "identity"
+workflow:
+  module_flow: "module-by-module"

@@ -10,3 +10,6 @@ test('validates the reference fixture', () => {
 test('rejects a missing workflow manifest', () => {
   assert.match(validate(resolve(root, 'fixtures/invalid-missing-manifest')).join('\n'), /missing .mawa-config/);
 });
+test('blocks implementation with incomplete readiness', () => {
+  assert.match(validate(resolve(root, 'fixtures/invalid-readiness')).join('\n'), /blocked by unchecked readiness/);
+});

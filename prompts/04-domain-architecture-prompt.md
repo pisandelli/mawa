@@ -46,8 +46,12 @@ Do not emit the completion message until all are true:
 - [ ] Module specification candidates are listed for Stage 05.
 - [ ] The ordered module plan exists and declares the configured flow mode.
 
+In `interactive` mode, present a localized summary of bounded contexts, ownership,
+dependencies, implementation order, phase gates, and unresolved risks. Offer numbered
+choices to approve or request changes before starting Stage 05.
+
 ## Stage completion message
 
 End with:
 
-> Domain Map and delivery plan are ready. Which planned module should Stage 05 specify first?
+> Domain Map and delivery plan are ready. Choose: 1. approve and select the next module; 2. request changes.

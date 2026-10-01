@@ -59,6 +59,14 @@ separate from the application.
    - root `eslint.config.mjs` from `resources/templates/eslint.config.template.mjs`.
 5. **Report what was applied:** list the commands run, packages added (dependency vs
    devDependency), and files created or modified. Automatic is not silent.
+6. Add the temporary welcome page from `resources/templates/welcome.page.template.vue`.
+   For a single-view application, use `app/app.vue`. For a routed application, use
+   `app/pages/index.vue` and omit `app/app.vue` or make it render `<NuxtPage />` (with
+   `<NuxtLayout>` only when distinct layouts are specified). The welcome page is replaced
+   by the first approved module implementation.
+7. Start the generated app long enough to make a local request to `/` and verify HTTP 200.
+   A startup failure or 404 blocks setup completion; report the command and actionable
+   diagnostic. Do not leave a development server running after the smoke check.
 
 ### Tier 2 — Present for confirmation (do not auto-apply)
 
@@ -85,6 +93,7 @@ Do not emit the completion message until all are true:
 - [ ] Fixed baseline applied (`ide`) or commands provided (`web`): Nuxt scaffold, `@pinia/nuxt` + `@nuxt/eslint` + `eslint` + `@vueuse/nuxt`, Pug runtime + language tooling when configured, and `nuxt.config.ts` / `tsconfig.json` / `eslint.config.mjs`.
 - [ ] New `nuxt.config.ts` has a literal, valid `compatibilityDate`; no template placeholder remains.
 - [ ] Baseline application was reported (commands run, packages added, files changed).
+- [ ] Temporary welcome page follows the selected routing strategy and `/` returned HTTP 200.
 - [ ] Tier 2 items (UI adapter, test toolchain, design tooling) presented, not auto-applied unless explicitly requested.
 - [ ] Selected UI operational docs loaded from `ui.docs.source_url` or requested from the human when required.
 - [ ] Design MCP/tooling reminder given when design is enabled.

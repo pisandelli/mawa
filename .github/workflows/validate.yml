@@ -17,3 +17,5 @@ jobs:
       - run: npm run validate -- fixtures/valid-project
       - name: Reject an invalid fixture
         run: '! npm run validate -- fixtures/invalid-missing-manifest'
+      - name: Reject incomplete implementation readiness
+        run: '! npm run validate -- fixtures/invalid-readiness'

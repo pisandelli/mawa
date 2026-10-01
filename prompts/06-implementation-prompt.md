@@ -22,6 +22,9 @@ Implement one approved module spec without an approved visual layout handoff.
 
 ## Rules
 
+- Re-read the module Implementation Readiness Checklist before code or dependency work. If
+  any blocking item is unchecked, do not define it on demand: record the blocker and
+  return to Stage 05. Only explicitly non-blocking deferrals may remain open.
 - Write all application code inside `paths.app_root` from `.mawa-config.yaml`. Never
   create app files at the MAWA root.
 - Do not redesign the module.
@@ -53,7 +56,8 @@ Do not emit the completion message until all are true:
 - [ ] Stores use the `{ data, loading, error }` shape; SSR hydration documented where relevant.
 - [ ] Required UX states handled (loading, error, empty, ideal, partial).
 - [ ] Types are strict; only the selected adapter's public APIs were used.
-- [ ] Unresolved dependencies captured as explicit TODOs.
+- [ ] Only explicitly non-blocking deferrals remain; no unresolved architecture, security,
+  persistence, authorization, migration, or dependency decision was implemented on demand.
 
 ## Stage completion message
 

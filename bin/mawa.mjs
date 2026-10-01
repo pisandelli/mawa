@@ -42,6 +42,16 @@ export function validate(rootDirectory) {
   }
   const planPath = resolve(root, 'specs/domain/module-plan.md');
   if (existsSync(planPath) && !/^# Module Delivery Plan/m.test(readFileSync(planPath, 'utf8'))) errors.push('module plan is missing the required title');
+  if (['06-implementation', '06a-implementation-from-approved-layout'].includes(stage)) {
+    const moduleName = yamlValue(config, 'name');
+    const specPath = moduleName && resolve(root, 'specs/modules', `${moduleName}.spec.md`);
+    if (!specPath || !existsSync(specPath)) errors.push('implementation requires an approved active module spec');
+    else {
+      const spec = readFileSync(specPath, 'utf8');
+      const readiness = spec.match(/## 15\. Implementation Readiness Checklist([\s\S]*?)(?:\n## |$)/)?.[1] || '';
+      if (/^- \[ \]/m.test(readiness)) errors.push(`implementation is blocked by unchecked readiness items in ${moduleName}`);
+    }
+  }
   const deliveryPath = resolve(root, 'specs/validation/project-delivery-checklist.md');
   if (stage === '08-project-delivery' && existsSync(deliveryPath) && !/## Release decision/m.test(readFileSync(deliveryPath, 'utf8'))) errors.push('delivery checklist is missing a Release decision section');
   return errors;

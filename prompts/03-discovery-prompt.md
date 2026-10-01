@@ -40,7 +40,8 @@ Generate:
 
 ## Interaction rules
 
-In `interactive` mode, ask before moving to Domain Architecture.
+In `interactive` mode, present a localized summary of goals, module candidates, risks,
+open questions, and readiness before asking whether to approve or request changes.
 In `continuous` mode, continue if the Discovery Spec is sufficiently complete.
 
 ## Definition of done
@@ -56,4 +57,4 @@ Do not emit the completion message until all are true:
 
 End with:
 
-> Discovery Spec is ready at `specs/discovery/discovery.spec.md`. May I proceed to Stage 04 — Domain Architecture?
+> Discovery Spec is ready. Review the localized summary and choose: 1. approve and proceed; 2. request changes.
