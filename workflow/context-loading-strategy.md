@@ -35,7 +35,9 @@ Output:
 Load:
 
 - `.mawa-config.yaml`
-- `specs/briefing/project-briefing.md`
+- `specs/domain/domain-map.md`
+- `specs/domain/module-plan.md`
+- approved module specs required by `state.setup_context`
 - `workflow/setup-policy.md`
 - selected UI adapter setup guide
 - selected design adapter setup guide
@@ -116,6 +118,15 @@ Load:
 - selected UI adapter checklist
 - selected design adapter handoff, if applicable
 - relevant DNA files
+
+## 08 Project Delivery
+
+Load:
+
+- `.mawa-config.yaml`
+- `specs/domain/module-plan.md`
+- all module reviews
+- `resources/templates/project-delivery-checklist.template.md`
 
 
 ## Adapter operational docs rule

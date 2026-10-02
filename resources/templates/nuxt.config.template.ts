@@ -11,6 +11,10 @@
 // declaration-package resolution (error TS6137). `@/types/*` is safe and needs no config.
 
 export default defineNuxtConfig({
+  // Stage 02 replaces this value with the local date on which it creates this file.
+  // Keep the resulting literal stable; do not use new Date() here.
+  compatibilityDate: '{{COMPATIBILITY_DATE}}',
+
   modules: [
     '@nuxt/eslint',
     '@vueuse/nuxt',

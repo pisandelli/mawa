@@ -16,6 +16,8 @@ It must then **clearly report what it did**. The baseline is:
 - `@pinia/nuxt`, `@nuxt/eslint` + `eslint`, `@vueuse/nuxt`;
 - when `core.template_language` is `pug`: `pug`, `@types/pug`, `@vue/language-plugin-pug`, and the matching `nuxt.config.ts` Vue compiler plugin configuration;
 - the baseline config files: `nuxt.config.ts`, `tsconfig.json`, `eslint.config.mjs`.
+- a literal `compatibilityDate` in `nuxt.config.ts`, materialized from the local creation
+  date in `YYYY-MM-DD` format. Existing values are preserved unless the human approves a change.
 
 After applying the baseline, MAWA must report: the commands it ran, the packages added
 (marking dependency vs devDependency), and the files it created or modified. All of this
@@ -27,7 +29,7 @@ the human applies them.
 ## Tier 2 — Everything else (confirm-first)
 
 For anything outside the fixed baseline — UI adapter packages, the optional test toolchain
-(`@nuxt/test-utils`, Vitest 3+, `vitest.config.ts`), design tooling/MCP, or any
+  (`@nuxt/test-utils`, peer-compatible current Vitest, `vitest.config.ts`), design tooling/MCP, or any
 choice-bearing dependency — MAWA does **not** install or modify config automatically. It
 must:
 

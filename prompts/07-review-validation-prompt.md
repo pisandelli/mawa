@@ -55,7 +55,9 @@ Do not consider the review complete until all are true:
 
 ## State update
 
-If the module is `Approved`, clear `state.active_module` before moving to the next module or set it to the next selected module at Stage 05.
+If the module is `Approved`, update its module-plan row to `review: approved` and clear
+`state.active_module`. Move to the next module when one remains; otherwise transition to
+`08-project-delivery`.
 
 If the module is `Rejected` — or `Approved with concerns` requiring changes — keep `state.active_module` and set `state.current_stage` to the required loop-back stage:
 

@@ -17,11 +17,16 @@ state:
   current_stage: "00-project-init" # next pending Stage ID; see workflow/orchestration.md
   completed_stages: [] # e.g. ["00-project-init", "01-project-briefing"]
   active_module: null # object during module stages; null outside module work
+  setup_context: null # first-approved-spec | all-specs | null; preserves the deferred setup resume point
   # Example during module work:
   # active_module:
   #   name: "billing"
   #   implementation_path: null # 06 | 06a | null
   #   design_handoff: null # used | skipped | null
+
+workflow:
+  # module-by-module keeps fast feedback; phase-by-phase completes each gate for the whole plan.
+  module_flow: "module-by-module" # module-by-module | phase-by-phase
 
 core:
   framework: "nuxt4"
@@ -72,6 +77,11 @@ paths:
 - UI and design adapters may vary.
 - Setup status must be confirmed by the human in interactive mode.
 - `state.current_stage` is the next pending stage, not a history label.
+- `workflow.module_flow` is selected during Stage 00. Missing means `module-by-module`
+  for backwards compatibility. The canonical ordered module plan is
+  `specs/domain/module-plan.md`; `state.active_module` remains only the current work item.
+- `state.setup_context` is set only while Stage 02 is deferred from the module plan. It
+  records why setup is now permitted; it does not authorize setup before the relevant spec gate.
 - Design signals have a clear precedence (do not conflate them):
   - `design.enabled` — global capability: is the design phase available at all.
   - `design.setup_status` / `design.mcp_status` — readiness of the design tooling.

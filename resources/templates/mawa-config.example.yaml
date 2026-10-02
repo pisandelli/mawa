@@ -12,11 +12,15 @@ state:
   current_stage: "00-project-init" # next pending Stage ID; see workflow/orchestration.md
   completed_stages: [] # e.g. ["00-project-init", "01-project-briefing"]
   active_module: null # object during module stages; null outside module work
+  setup_context: null # first-approved-spec | all-specs | null
   # Example during module work:
   # active_module:
   #   name: "billing"
   #   implementation_path: null # 06 | 06a | null
   #   design_handoff: null # used | skipped | null
+
+workflow:
+  module_flow: "module-by-module" # module-by-module | phase-by-phase
 
 core:
   framework: "nuxt4"

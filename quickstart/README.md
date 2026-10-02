@@ -39,7 +39,7 @@ Quick Review      → checklist pass (inline, or specs/reviews/quickstart.review
 ## Files
 
 - `briefing-template.md` — lightweight briefing input.
-- `prompt.md` — the single condensed protocol (replaces stages 00–07).
+- `prompt.md` — the single condensed protocol (replaces stages 00–08).
 - `spec-template.md` — the single Quick Spec template.
 
 ## What still applies (no exceptions)

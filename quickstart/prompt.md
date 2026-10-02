@@ -1,6 +1,6 @@
 # Quickstart Protocol
 
-A single condensed protocol for small MAWA projects. It replaces stages 00–07 of the
+A single condensed protocol for small MAWA projects. It replaces stages 00–08 of the
 full workflow. Use it only when the project fits the criteria in this folder's README.
 
 ## Role

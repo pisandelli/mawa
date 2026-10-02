@@ -3,7 +3,8 @@
 //
 // Without this, plain `vitest` fails on MAWA stores with `ReferenceError: ref is not defined`.
 //
-// Requires (dev deps): @nuxt/test-utils, vitest@^3 (Nuxt 4 needs Vitest 3+), happy-dom.
+// Install @nuxt/test-utils and the newest stable Vitest version accepted by its peer range,
+// plus a supported happy-dom version. Never pin Vitest 3 from this historical template.
 // Per-file override is also possible with a top comment: `// @vitest-environment nuxt`.
 
 import { defineVitestConfig } from '@nuxt/test-utils/config';

@@ -46,6 +46,7 @@ Do not emit the completion message until all are true:
 - [ ] Entities, business rules, APIs, state, UI, permissions, and tests are defined.
 - [ ] The implementation readiness checklist (section 15) passes.
 - [ ] `state.active_module.name` is set to this module.
+- [ ] Every readiness item is either complete or explicitly classified non-blocking with owner, impact, and review stage; no security, persistence, authorization, migration, dependency, or architecture decision remains blocking.
 
 ## State update
 
@@ -58,11 +59,19 @@ active_module:
   design_handoff: null
 ```
 
-Then update `state.current_stage` to `05a-design-handoff` or `06-implementation` according to the selected path.
+Update the module row in `specs/domain/module-plan.md` to `spec: approved`. In
+`module-by-module`, if setup is not confirmed, set `state.setup_context:
+"first-approved-spec"` and `state.current_stage: "02-environment-setup"`. After setup,
+choose the design or implementation path for this module. In `phase-by-phase`, return to
+`05-module-spec` for the next pending module; only after every spec passes set
+`state.setup_context: "all-specs"` and enter Stage 02. Only after setup may the design or
+implementation phase begin.
+
+Do not treat unanswered implementation decisions as work to define on demand in Stage 06. Return to this stage for a blocking decision. In the approval summary, identify each decision as inherited, newly confirmed, assumption, non-blocking deferral, or blocker.
 
 ## Stage completion message
 
-If `design.enabled = true` (the design phase is optional — offer both paths):
+In `module-by-module`, if `design.enabled = true` (the design phase is optional — offer both paths):
 
 > Module Spec is ready. Do you want to run Stage 05a — Design Handoff (approve a layout in the design tool first), or skip design and go straight to Stage 06 — Implementation?
 

@@ -38,14 +38,15 @@ chooses to let the agent structure the UI directly. In that case go to Stage 06.
    preserve, known constraints, adapter-specific notes.
 5. **Enter standby.** Hand control to the human. Do not generate implementation code.
    The human iterates inside the design tool until the layout is approved.
-6. **Resume** when `specs/layouts/[module-name].approved-layout.md` exists and the human
-   confirms approval. Then proceed to Stage 06a.
+6. **Resume** only when the layout contains an explicit human approval record (approver,
+   date, decision) and the human confirms it. File existence alone is not approval. In
+   `phase-by-phase`, return to the next pending layout; otherwise proceed to Stage 06a.
 
 ## Standby rule
 
 This stage always waits for the human regardless of `interaction_mode`, because design
-is an external, human-driven activity. In `continuous` mode, resume automatically once
-the approved-layout artifact is present.
+is an external, human-driven activity. In `continuous` mode, resume automatically only
+once the approved-layout artifact includes its approval record.
 
 ## Output
 
@@ -54,7 +55,8 @@ the approved-layout artifact is present.
 
 ## State update
 
-When the approved layout is available, preserve `state.active_module.name` and set:
+When the approved layout is available, update its row in `specs/domain/module-plan.md`,
+preserve `state.active_module.name`, and set:
 
 ```yaml
 state:
@@ -65,7 +67,9 @@ state:
   current_stage: "06a-implementation-from-approved-layout"
 ```
 
-If the human skips design for this module, preserve `state.active_module.name` and set `design_handoff: "skipped"`, `implementation_path: "06"`, and `current_stage: "06-implementation"`.
+If the human skips design for this module, preserve `state.active_module.name`, update the
+plan, and set `design_handoff: "skipped"`, `implementation_path: "06"`, and
+`current_stage: "06-implementation"`.
 
 ## Definition of done
 

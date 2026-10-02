@@ -1,5 +1,5 @@
 // @vitest-environment nuxt
-// Requires @nuxt/test-utils + Vitest 3 + vitest.config (nuxt env), per resources/templates/vitest.config.template.ts.
+// Requires @nuxt/test-utils + a peer-compatible current Vitest + vitest.config (nuxt env).
 // The nuxt environment provides Nuxt auto-imports (ref, computed, acceptHMRUpdate) and the `@/` alias.
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';

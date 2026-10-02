@@ -7,19 +7,21 @@ MAWA stage order:
   ↓
 01 Project Briefing
   ↓
-02 Environment Setup
-  ↓
 03 Discovery
   ↓
 04 Domain Architecture
   ↓
 05 Module Spec
   ↓
+02 Environment Setup (just-in-time; see flow mode)
+  ↓
 05a Design Handoff   (optional — only if design.enabled = true and a layout is wanted)
   ↓
 06 or 06a Implementation
   ↓
 07 Review & Validation
+  ↓
+08 Project Delivery
 ```
 
 `state.current_stage` means the **next pending stage to run**.
@@ -45,6 +47,7 @@ After every completed stage, update `state` in `.mawa-config.yaml` so the run ca
 | `06-implementation` | `prompts/06-implementation-prompt.md` | code implementation |
 | `06a-implementation-from-approved-layout` | `prompts/06a-implementation-from-approved-layout-prompt.md` | code implementation from approved layout |
 | `07-review-validation` | `prompts/07-review-validation-prompt.md` | `specs/reviews/[module-name].review.md` |
+| `08-project-delivery` | `prompts/08-project-delivery-prompt.md` | `specs/validation/project-delivery-checklist.md` |
 
 ## Seed flow
 
@@ -57,6 +60,18 @@ specs/discovery/discovery.spec.md
 ```
 
 The Raw Briefing is always the seed. Discovery must not run directly from an unstructured Raw Briefing unless the human explicitly bypasses Project Briefing.
+
+## Setup timing
+
+Stage 02 is deferred for a new application. It installs no app code before architecture and
+the required specs exist:
+
+- `module-by-module`: run Stage 02 after the first approved module spec, before that
+  module enters design or implementation.
+- `phase-by-phase`: run Stage 02 after every planned module spec is approved, before the
+  layout or implementation phase begins.
+- existing application: Stage 00 may inventory the selected app root read-only; Stage 02
+  still waits for the same gate before modifying setup.
 
 ## Design phase (optional)
 
@@ -94,15 +109,22 @@ go straight to Stage 06. Record the choice in `state.active_module` handling and
 
 MAWA is not strictly single-pass:
 
-- **Multi-module loop.** After Stage 07 for a module, if more modules remain in
+- **Multi-module loop.** In `module-by-module`, after Stage 07 for a module, if more modules remain in
   `specs/domain/domain-map.md`, clear or replace `state.active_module` and return to Stage 05 for the next module. Repeat
   05 → (05a) → 06/06a → 07 per module until the domain map is covered.
+- **Phase-by-phase loop.** In `phase-by-phase`, Stage 05 returns to the next planned
+  module until all specs pass. Stage 05a then returns to the next applicable layout until
+  all layouts are approved or skipped. Only then may Stage 06/06a start, in the approved
+  implementation order. `specs/domain/module-plan.md` records every status and gate.
 - **Review rejection loop.** If Stage 07 returns `Rejected` or `Approved with concerns`
   requiring changes, return to the stage that owns the fix: the implementation stage
   (06 or 06a) for a code defect, Stage 05 if the spec itself is wrong, or Stage 02 if it
   is a setup/config/tooling defect (e.g. missing dependency, `tsconfig.json`, or test
   toolchain). Then re-run Stage 07. Do not advance to the next module while the current
   one is `Rejected`.
+
+When every module is approved, transition to Stage 08 rather than declaring the project
+delivered. Stage 08 is the integrated release gate.
 
 ## Interaction mode
 
