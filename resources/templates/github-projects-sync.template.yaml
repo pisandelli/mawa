@@ -1,0 +1,8 @@
+# Created only by the GitHub Projects management adapter after a confirmed sync.
+version: 1
+adapter: github-projects
+repository: "owner/repository"
+project:
+  owner: "owner-or-organization"
+  number: 1
+modules: {}

@@ -29,15 +29,21 @@ Act as the MAWA workflow coordinator.
    - interactive mode
    - DareDash UI adapter by default
    - Pencil design adapter by default
-5. Confirm the application directory and record it as `paths.app_root`. Ask the human:
+   - local-only product management by default (`management.enabled: false`)
+5. Offer the optional GitHub Projects management adapter without making it part of the
+   baseline. If the human enables it, collect the repository, Project owner/number, and
+   chosen transport (`github-api` by default; `gh` only on request). Do not ask for or
+   write a token. Refer to `adapters/management/github-projects/setup.md` for the
+   preflight that happens later, before any external write.
+6. Confirm the application directory and record it as `paths.app_root`. Ask the human:
    > In which directory should the Nuxt application be created? (default `./web`; use `.` to build at the repo root)
 
    This keeps the application separate from the MAWA workflow files. Do not use `./app`
    (it collides with Nuxt's `app/` srcDir). All later setup and implementation happen
    inside `paths.app_root`.
-6. Initialize the `state` block in `.mawa-config.yaml`. While Stage 00 is running, `current_stage` may be `00-project-init`; once Stage 00 passes its Definition of Done, update `completed_stages` with `00-project-init` and set `current_stage: "01-project-briefing"`. Keep `active_module: null`.
-7. Do not perform environment setup yet.
-8. Do not generate the Project Briefing yet unless explicitly continuing to stage 01.
+7. Initialize the `state` block in `.mawa-config.yaml`. While Stage 00 is running, `current_stage` may be `00-project-init`; once Stage 00 passes its Definition of Done, update `completed_stages` with `00-project-init` and set `current_stage: "01-project-briefing"`. Keep `active_module: null`.
+8. Do not perform environment setup yet.
+9. Do not generate the Project Briefing yet unless explicitly continuing to stage 01.
 
 ## Human interaction
 
@@ -59,6 +65,8 @@ Do not emit the completion message until all are true:
 - [ ] `paths.app_root` is set (application directory confirmed with the human).
 - [ ] Raw Briefing location confirmed (`inputs/raw-briefing.md`).
 - [ ] MAWA defaults confirmed or explicitly overridden.
+- [ ] Optional management integration is disabled or its repository, Project, and
+  transport configuration are explicit; no credential was recorded in the manifest.
 - [ ] Stage completion state update is ready: `completed_stages` includes `00-project-init` and `current_stage` points to `01-project-briefing`.
 
 ## Stage completion message

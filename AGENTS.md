@@ -22,6 +22,8 @@ On any session in a MAWA project, before doing product work:
 3. Read `workflow/orchestration.md` for stage order and branching.
 4. Load only the context required for the current stage, per
    `workflow/context-loading-strategy.md`. Do not preload everything.
+   - When `management.enabled` is true, load the selected management adapter only for a
+     stage that needs backlog preview or sync. Do not load credentials from project files.
 5. Execute the stage protocol in `prompts/` that matches `state.current_stage`.
    If the protocol file is not available in the current execution environment, ask
    the human to provide or upload it before proceeding.
@@ -132,6 +134,9 @@ These hold in every stage, in every interaction mode (`governance/core-rules.md`
   dependencies at the MAWA root. Workflow files and `specs/` stay at the MAWA root.
 - **Adapters:** use the selected UI/design adapter docs as the source of truth. Never
   invent component APIs.
+- **Management adapters:** management is opt-in. Before any external write, run the
+  selected adapter preflight, show its dry-run preview, and obtain explicit human approval.
+  Do not overwrite human-managed planning fields or store credentials in MAWA artifacts.
 
 ---
 

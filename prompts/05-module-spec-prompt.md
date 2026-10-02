@@ -17,6 +17,8 @@ Generate an implementation-ready specification for one module.
 ## Output
 
 - `specs/modules/[module-name].spec.md`
+- A GitHub Issue and GitHub Project item only when the management adapter is enabled and
+  the human explicitly approves the adapter dry-run
 
 ## Required sections
 
@@ -59,6 +61,23 @@ active_module:
 ```
 
 Then update `state.current_stage` to `05a-design-handoff` or `06-implementation` according to the selected path.
+
+## Optional management sync
+
+When `management.enabled = true`, load
+`adapters/management/github-projects/rules.md` and
+`specs/management/github-projects-sync.yaml` when it exists.
+
+After the module spec itself passes the Definition of Done:
+
+1. Generate a dry-run preview for the proposed Issue, labels, milestone reference (if any),
+   and Project item. Include the target repository and Project explicitly.
+2. Ask for explicit human approval to publish that preview. A spec approval alone is not
+   authorization for an external write.
+3. On approval, synchronize exactly one MAWA-owned Issue and Project item according to the
+   adapter rules, then update the local sync map.
+4. On rejection or deferral, retain the approved spec and continue the MAWA stage flow;
+   report that publication remains pending.
 
 ## Stage completion message
 

@@ -45,6 +45,22 @@ design:
   handoff_required: true
   setup_status: "pending" # pending | confirmed | skipped
 
+# Optional. Remove or keep disabled for a local-only MAWA workflow.
+management:
+  enabled: false
+  adapter: "github-projects"
+  transport: "github-api" # github-api | gh
+  sync_mode: "approval-required" # approval-required | dry-run
+  repository: "owner/repository"
+  project:
+    owner: "owner-or-organization"
+    number: 1
+  labels:
+    enabled: true
+    managed: ["mawa", "type:module"]
+  milestones:
+    strategy: "manual" # manual | phase
+
 paths:
   app_root: "./web" # Nuxt application root; setup + implementation happen here. "." = repo root. Avoid "./app" (Nuxt srcDir collision).
   raw_briefing: "inputs/raw-briefing.md"

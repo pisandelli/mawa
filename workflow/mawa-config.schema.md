@@ -53,6 +53,22 @@ design:
   handoff_required: true
   setup_status: "pending" # pending | confirmed | skipped
 
+# Optional product-management integration. Omit this block to keep MAWA local-only.
+management:
+  enabled: false
+  adapter: "github-projects" # github-projects
+  transport: "github-api" # github-api | gh
+  sync_mode: "approval-required" # approval-required | dry-run
+  repository: "owner/repository"
+  project:
+    owner: "owner-or-organization"
+    number: 1
+  labels:
+    enabled: true
+    managed: ["mawa", "type:module"]
+  milestones:
+    strategy: "manual" # manual | phase
+
 paths:
   app_root: "./web" # Nuxt application root; setup + implementation happen here. Use "." to keep the app at the repo root. Avoid "./app" (collides with Nuxt's app/ srcDir).
   raw_briefing: "inputs/raw-briefing.md"
@@ -77,6 +93,12 @@ paths:
   - `design.setup_status` / `design.mcp_status` — readiness of the design tooling.
   - `state.active_module.design_handoff` — the actual per-module outcome (`used` / `skipped`), and the source of truth for what happened to a given module.
 - `design.enabled = false` skips Stage 05a; implementation runs through Stage 06.
+- `management.enabled = false` (or an omitted `management` block) keeps MAWA entirely
+  local. The GitHub Projects adapter never activates implicitly.
+- The management token is supplied through the execution environment (for example,
+  `GITHUB_TOKEN`); never store a token in `.mawa-config.yaml` or in a generated artifact.
+- `management.sync_mode: approval-required` is the default. Any GitHub write requires a
+  human approval after a dry-run preview. `dry-run` never performs a write.
 - `paths.app_root` is the Nuxt application root. All dependency installs, config files
   (`nuxt.config.ts`, `tsconfig.json`, `package.json`), and implementation code are
   created **inside** it. MAWA workflow files and the `specs/` artifacts stay at the MAWA

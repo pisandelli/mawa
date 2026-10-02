@@ -12,6 +12,7 @@ MAWA remains adapter-based for:
 - UI libraries;
 - design tools;
 - design-to-implementation handoff rules.
+- optional product-management integrations.
 
 Default stack:
 
@@ -147,6 +148,7 @@ mawa/
 ├── adapters/
 │   ├── ui/
 │   └── design/
+│   └── management/
 ├── dna/
 │   ├── nuxt4/
 │   └── nuxt4-daredash/
@@ -160,7 +162,7 @@ mawa/
 ## Application Location
 
 The Nuxt application is kept separate from the workflow files. Its directory is set in
-`.mawa-config.md` as `paths.app_root` (default `./web`, asked during Stage 00). All setup
+`.mawa-config.yaml` as `paths.app_root` (default `./web`, asked during Stage 00). All setup
 and implementation happen inside it; MAWA's workflow files and `specs/` stay at the root.
 Use `.` to build the app at the repo root. Avoid `./app` — it collides with Nuxt 4's
 `app/` srcDir.

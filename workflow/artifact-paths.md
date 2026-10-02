@@ -29,6 +29,7 @@ specs/domain/domain-map.md
 specs/modules/[module-name].spec.md
 specs/layouts/[module-name].approved-layout.md
 specs/reviews/[module-name].review.md
+specs/management/github-projects-sync.yaml
 ```
 
 ## Rules
@@ -36,3 +37,6 @@ specs/reviews/[module-name].review.md
 - Do not create parallel `docs/specs` paths.
 - Do not store the Raw Briefing inside `specs/` unless explicitly requested.
 - Do not rename `project-briefing.md` to `briefing.md`; keep the distinction explicit.
+- `specs/management/github-projects-sync.yaml` is created only when the GitHub Projects
+  management adapter is enabled. It records MAWA-owned links to GitHub Issues and Project
+  items; it is not a replacement for the product backlog.

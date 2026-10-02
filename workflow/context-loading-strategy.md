@@ -61,6 +61,7 @@ Load:
 - `.mawa-config.yaml`
 - `governance/core-rules.md`
 - `workflow/module-boundaries.md`
+- selected management adapter rules, only when `management.enabled = true`
 
 ## 05 Module Spec
 
@@ -73,6 +74,7 @@ Load:
 - `governance/SKILL.md`
 - selected UI adapter rules
 - selected UI operational docs when required, loaded from `ui.docs.source_url`
+- selected management adapter rules and its sync map, only when `management.enabled = true`
 
 ## 05a Design Handoff (optional)
 
