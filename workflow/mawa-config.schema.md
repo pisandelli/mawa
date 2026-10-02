@@ -62,7 +62,14 @@ management:
   repository: "owner/repository"
   project:
     owner: "owner-or-organization"
-    number: 1
+    number: 1 # null while a Project bootstrap is pending
+  bootstrap:
+    repository: "connect-existing" # connect-existing | create
+    project: "connect-existing" # connect-existing | create
+    repository_visibility: "private" # private | public; used only when creating a repository
+    views:
+      kanban: true
+      roadmap: true
   labels:
     enabled: true
     managed: ["mawa", "type:module"]
@@ -99,6 +106,10 @@ paths:
   `GITHUB_TOKEN`); never store a token in `.mawa-config.yaml` or in a generated artifact.
 - `management.sync_mode: approval-required` is the default. Any GitHub write requires a
   human approval after a dry-run preview. `dry-run` never performs a write.
+- `management.bootstrap` declares whether MAWA connects to existing GitHub resources or
+  creates the missing repository and/or Project after a separate bootstrap preview and
+  explicit approval. A newly created repository is empty and private by default. The
+  default Project bootstrap creates Kanban and Roadmap views.
 - `paths.app_root` is the Nuxt application root. All dependency installs, config files
   (`nuxt.config.ts`, `tsconfig.json`, `package.json`), and implementation code are
   created **inside** it. MAWA workflow files and the `specs/` artifacts stay at the MAWA

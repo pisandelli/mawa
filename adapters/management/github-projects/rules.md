@@ -7,9 +7,30 @@
 - Always run preflight and a dry-run before an external write. `sync_mode: dry-run` never
   writes.
 - A human must approve each publish preview in `approval-required` mode.
+- A resource bootstrap is a separate external write. It requires its own preflight,
+  dry-run preview, and explicit approval even when the human already enabled the adapter.
 - The adapter owns only records listed in `specs/management/github-projects-sync.yaml`.
   Never update, relabel, or move unrelated Issues or Project items.
 - Never persist a token, authentication output, or secret in the repository.
+
+## Bootstrap rules
+
+- Ask whether the repository and Project exist before attempting a connection. Never infer
+  their absence from an authentication or lookup error.
+- Create only the resource explicitly marked `create` in `management.bootstrap`; connect
+  to the other resource when it already exists.
+- A repository bootstrap creates an empty remote repository with the approved visibility.
+  It never initializes, changes, or pushes the local Git checkout.
+- A Project bootstrap must preflight support for the Kanban contract (`Status` and
+  `Backlog`) and its requested views before any resource is created. The default baseline
+  creates a Kanban board grouped by Status and a Roadmap view using the target-date field.
+  If the selected transport cannot support the requested configuration, stop and direct
+  the human to create/configure the Project manually.
+- Do not create labels, milestones, Issues, or Project items during bootstrap. Those are
+  managed only in an approved module-spec synchronization.
+- Persist bootstrap results only after each remote operation is confirmed. On a partial or
+  ambiguous result, retain the proposed configuration and record/report the exact resource
+  that needs reconciliation. Never delete a partially created remote resource automatically.
 
 ## Issue contract
 

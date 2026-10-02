@@ -55,6 +55,13 @@ management:
   project:
     owner: "owner-or-organization"
     number: 1
+  bootstrap:
+    repository: "connect-existing" # connect-existing | create
+    project: "connect-existing" # connect-existing | create
+    repository_visibility: "private" # private | public; used only when creating a repository
+    views:
+      kanban: true
+      roadmap: true
   labels:
     enabled: true
     managed: ["mawa", "type:module"]

@@ -15,11 +15,17 @@ It begins with a Kanban Project. The same Project may have a Roadmap view, where
 uses phase and date fields to plan work. MAWA never creates dates, priorities, assignees,
 iterations, or statuses without an explicit future policy.
 
-## Enable it
+## Connect or bootstrap
 
 Add a `management` block to `.mawa-config.yaml` and follow [setup.md](setup.md). The
 default transport is the direct GitHub API. `gh` is supported only when the human chooses
 it in the manifest.
+
+During Stage 00, MAWA asks whether the repository and Project already exist. Each resource
+may be connected independently or created through an explicit bootstrap preview. Creating
+a repository does not initialize local Git, push code, create a README, or change the
+application directory. Creating a Project prepares both its Kanban baseline and a Roadmap
+view. Both actions require a second approval after their precise remote effects are shown.
 
 ## Lifecycle
 

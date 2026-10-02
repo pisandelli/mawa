@@ -31,10 +31,29 @@ Act as the MAWA workflow coordinator.
    - Pencil design adapter by default
    - local-only product management by default (`management.enabled: false`)
 5. Offer the optional GitHub Projects management adapter without making it part of the
-   baseline. If the human enables it, collect the repository, Project owner/number, and
-   chosen transport (`github-api` by default; `gh` only on request). Do not ask for or
-   write a token. Refer to `adapters/management/github-projects/setup.md` for the
-   preflight that happens later, before any external write.
+   baseline. If the human enables it, ask first whether the repository and GitHub Project
+   already exist. Collect the owner and repository name, Project owner, and chosen
+   transport (`github-api` by default; `gh` only on request). Do not ask for or write a
+   token.
+
+   For each missing resource, offer an explicit bootstrap option. Record the choice in
+   `management.bootstrap`:
+
+   - `connect-existing` — record the existing repository or Project number;
+   - `create` — propose creating the missing resource, but do not write yet.
+
+   When a repository is to be created, ask for its visibility and suggest `private`. When
+   a Project is to be created, use the configured Project owner and project name. Show a
+   bootstrap dry-run that names every resource to be created, its owner, visibility, and
+   expected Kanban and Roadmap configuration. Ask for a second, explicit approval before
+   creating anything. On confirmed success, persist the returned repository identifier and
+   Project number in the manifest. Preflight must verify that the selected transport can
+   create the required Project fields and views. If a remote call still fails after a
+   resource was created, report the exact partial state for reconciliation; never hide it
+   or retry blindly.
+
+   Refer to `adapters/management/github-projects/setup.md` for the preflight and bootstrap
+   contract.
 6. Confirm the application directory and record it as `paths.app_root`. Ask the human:
    > In which directory should the Nuxt application be created? (default `./web`; use `.` to build at the repo root)
 
@@ -66,7 +85,8 @@ Do not emit the completion message until all are true:
 - [ ] Raw Briefing location confirmed (`inputs/raw-briefing.md`).
 - [ ] MAWA defaults confirmed or explicitly overridden.
 - [ ] Optional management integration is disabled or its repository, Project, and
-  transport configuration are explicit; no credential was recorded in the manifest.
+  transport configuration are explicit; existing resources were verified or missing
+  resources have an explicit bootstrap choice; no credential was recorded in the manifest.
 - [ ] Stage completion state update is ready: `completed_stages` includes `00-project-init` and `current_stage` points to `01-project-briefing`.
 
 ## Stage completion message
