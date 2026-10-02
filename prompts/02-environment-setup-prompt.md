@@ -2,7 +2,8 @@
 
 ## Purpose
 
-Set up the selected Nuxt 4 project configuration and adapters.
+Set up the selected Nuxt 4 project configuration and adapters only after the deferred
+module-plan gate has made the work technically meaningful.
 
 Setup is two-tier (`workflow/setup-policy.md`): the **fixed baseline** is auto-applied and
 reported; **everything else** is presented for the human to confirm. MAWA never installs
@@ -32,12 +33,15 @@ separate from the application.
 ## Required behavior
 
 1. Read `.mawa-config.yaml`.
-2. Read the selected UI adapter setup guide.
-3. Read the selected design adapter setup guide, if design workflow is enabled.
+2. Verify `state.setup_context`: `first-approved-spec` is valid only for
+   `module-by-module`; `all-specs` is valid only after every planned spec is approved in
+   `phase-by-phase`. If neither is true, stop and return to the appropriate spec stage.
+3. Read the selected UI adapter setup guide.
+4. Read the selected design adapter setup guide, if design workflow is enabled.
 
 ### Tier 1 — Apply the fixed baseline (auto, then report)
 
-4. In `ide` execution mode, install and configure the fixed baseline automatically inside
+5. In `ide` execution mode, install and configure the fixed baseline automatically inside
    `paths.app_root`, without asking first. In `web` mode, provide the commands for the
    human to run. The baseline is:
    - the Nuxt 4 scaffold, if the application does not exist yet (`pnpm create nuxt@latest <app_root>`);
@@ -57,26 +61,29 @@ separate from the application.
      references — NOT the Nuxt 3 `extends` pattern; without it `nuxi typecheck` cannot
      resolve auto-imported globals, e.g. `Cannot find name 'ref'`);
    - root `eslint.config.mjs` from `resources/templates/eslint.config.template.mjs`.
-5. **Report what was applied:** list the commands run, packages added (dependency vs
+6. **Report what was applied:** list the commands run, packages added (dependency vs
    devDependency), and files created or modified. Automatic is not silent.
-6. Add the temporary welcome page from `resources/templates/welcome.page.template.vue`.
+7. Add the temporary welcome page from `resources/templates/welcome.page.template.vue`.
    For a single-view application, use `app/app.vue`. For a routed application, use
    `app/pages/index.vue` and omit `app/app.vue` or make it render `<NuxtPage />` (with
    `<NuxtLayout>` only when distinct layouts are specified). The welcome page is replaced
    by the first approved module implementation.
-7. Start the generated app long enough to make a local request to `/` and verify HTTP 200.
+8. Start the generated app long enough to make a local request to `/` and verify HTTP 200.
    A startup failure or 404 blocks setup completion; report the command and actionable
    diagnostic. Do not leave a development server running after the smoke check.
 
 ### Tier 2 — Present for confirmation (do not auto-apply)
 
-6. Present any remaining UI-adapter-specific install commands and configuration snippets,
+9. Present any remaining UI-adapter-specific install commands and configuration snippets,
    and explain adapter-specific decisions.
-7. If tests are planned, inspect the selected `@nuxt/test-utils` peer range and present a compatible current Vitest, DOM environment, `vue-tsc`, and TypeScript matrix. Use the Nuxt test template; plain Vitest without the Nuxt environment fails on MAWA stores with `ReferenceError: ref is not defined`. Run both `nuxi typecheck` and tests before calling the matrix supported.
-8. Remind the human that design MCP/tooling must already be configured externally. If the design MCP is unavailable, the human may set `design.enabled: false` (skip design globally) or skip per module at Stage 05a.
-9. Verify that selected UI operational docs can be loaded from `ui.docs.source_url` when needed. If they are not available in the current session, load them from the URL or, in `web` mode when fetching is unavailable, ask the human to provide the current content. Do not commit a local copy by default.
-10. Apply Tier 2 items automatically only if the human explicitly asks; otherwise ask the human to confirm completion.
-11. Update or instruct the human to update `.mawa-config.yaml` setup status.
+10. If tests are planned, inspect the selected `@nuxt/test-utils` peer range and present a compatible current Vitest, DOM environment, `vue-tsc`, and TypeScript matrix. Use the Nuxt test template; plain Vitest without the Nuxt environment fails on MAWA stores with `ReferenceError: ref is not defined`. Run both `nuxi typecheck` and tests before calling the matrix supported.
+11. Remind the human that design MCP/tooling must already be configured externally. If the design MCP is unavailable, the human may set `design.enabled: false` (skip design globally) or skip per module at Stage 05a.
+12. Verify that selected UI operational docs can be loaded from `ui.docs.source_url` when needed. If they are not available in the current session, load them from the URL or, in `web` mode when fetching is unavailable, ask the human to provide the current content. Do not commit a local copy by default.
+13. Apply Tier 2 items automatically only if the human explicitly asks; otherwise ask the human to confirm completion.
+14. Update or instruct the human to update `.mawa-config.yaml` setup status. Clear
+    `state.setup_context`, then route to 05a/06 for the active module in
+    `module-by-module`, or to the first applicable layout/implementation phase in
+    `phase-by-phase`.
 
 ## Setup policy
 
@@ -98,9 +105,11 @@ Do not emit the completion message until all are true:
 - [ ] Selected UI operational docs loaded from `ui.docs.source_url` or requested from the human when required.
 - [ ] Design MCP/tooling reminder given when design is enabled.
 - [ ] `ui.setup_status` / `design.setup_status` recorded; human confirmed completion (interactive mode).
+- [ ] `state.setup_context` was valid for the selected flow and was cleared with an
+  unambiguous next stage after setup.
 
 ## Stage completion message
 
 End with:
 
-> Environment setup is confirmed. May I proceed to Stage 03 — Discovery?
+> Environment setup is confirmed. May I proceed to the next approved design or implementation stage?

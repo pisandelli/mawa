@@ -35,7 +35,9 @@ Output:
 Load:
 
 - `.mawa-config.yaml`
-- `specs/briefing/project-briefing.md`
+- `specs/domain/domain-map.md`
+- `specs/domain/module-plan.md`
+- approved module specs required by `state.setup_context`
 - `workflow/setup-policy.md`
 - selected UI adapter setup guide
 - selected design adapter setup guide

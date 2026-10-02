@@ -19,3 +19,5 @@ jobs:
         run: '! npm run validate -- fixtures/invalid-missing-manifest'
       - name: Reject incomplete implementation readiness
         run: '! npm run validate -- fixtures/invalid-readiness'
+      - name: Reject setup at the wrong flow gate
+        run: '! npm run validate -- fixtures/invalid-setup-context'

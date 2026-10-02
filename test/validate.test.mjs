@@ -13,3 +13,6 @@ test('rejects a missing workflow manifest', () => {
 test('blocks implementation with incomplete readiness', () => {
   assert.match(validate(resolve(root, 'fixtures/invalid-readiness')).join('\n'), /blocked by unchecked readiness/);
 });
+test('rejects setup before the matching flow gate', () => {
+  assert.match(validate(resolve(root, 'fixtures/invalid-setup-context')).join('\n'), /first-approved-spec setup context requires module-by-module/);
+});

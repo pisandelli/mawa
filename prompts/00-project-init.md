@@ -21,7 +21,7 @@ Act as the MAWA workflow coordinator.
 
 1. Check whether `inputs/raw-briefing.md` exists.
 2. If the human provided the raw idea in chat and the file does not exist: in `ide` execution mode, offer to write it to `inputs/raw-briefing.md` yourself (writing a seed file is not a destructive setup action); in `web` mode, instruct the human to save it there.
-3. Run a short, progressive configuration interview before writing a new manifest. Every user-facing question, numbered option, summary, and approval request uses `mawa.human_language`; technical artifacts remain in `artifact_language`. Ask one choice at a time: confirm project name when it cannot be inferred; confirm `paths.app_root`; then ask whether to keep defaults or customize. Present paths as numbered options and state that they are relative to the directory containing the manifest: `1. ../web` (outside MAWA), `2. ./web` (inside MAWA), `3. .` (MAWA root), `4. another path`. Customization may select UI adapter, design adapter/skip, template language, and `workflow.module_flow`.
+3. Run a short, progressive configuration interview before writing a new manifest. Every user-facing question, numbered option, summary, and approval request uses `mawa.human_language`; technical artifacts remain in `artifact_language`. Ask one choice at a time: confirm project name when it cannot be inferred; confirm `paths.app_root`; **always ask `workflow.module_flow` even when every other default is accepted**; then ask whether to customize the remaining choices. Present the flow options as `1. module-by-module (recommended default)` and `2. phase-by-phase`, explaining their different setup timing. Present paths as numbered options and state that they are relative to the directory containing the manifest: `1. ../web` (outside MAWA), `2. ./web` (inside MAWA), `3. .` (MAWA root), `4. another path`. Customization may select UI adapter, design adapter/skip, and template language.
 4. Present a readable summary of every value that will be written, including both the configured and resolved application path, and obtain explicit approval before creating or changing `.mawa-config.yaml` in `interactive` mode. For an existing manifest, show the changed values. In `continuous` mode record safe defaults and still present the summary when a material choice was not inferable.
 5. Create or update `.mawa-config.yaml` according to `workflow/mawa-config.schema.md`, including the `state` block (`current_stage`, `completed_stages`, `active_module`). Use `resources/templates/mawa-config.example.yaml` as the starting point.
 6. Confirm the MAWA defaults unless already configured:
@@ -31,6 +31,9 @@ Act as the MAWA workflow coordinator.
    - interactive mode
    - DareDash UI adapter by default
    - Pencil design adapter by default
+7. After `paths.app_root` is known, if an application already exists there, perform only a
+   read-only inventory of its package/config files and report the result. Do not install,
+   edit, or run its setup until the deferred Stage 02 gate is reached.
 5. Confirm the application directory and record it as `paths.app_root`. Ask the human:
    > In which directory should the Nuxt application be created? (default `./web`; use `.` to build at the repo root)
 
@@ -61,6 +64,8 @@ Do not emit the completion message until all are true:
 - [ ] `paths.app_root` is set (application directory confirmed with the human).
 - [ ] Raw Briefing location confirmed (`inputs/raw-briefing.md`).
 - [ ] MAWA defaults confirmed or explicitly overridden.
+- [ ] `workflow.module_flow` was explicitly selected, or an existing legacy value was shown
+  and confirmed before it was changed.
 - [ ] The proposed manifest summary was approved before a new or changed manifest was written in interactive mode.
 - [ ] Stage completion state update is ready: `completed_stages` includes `00-project-init` and `current_stage` points to `01-project-briefing`.
 

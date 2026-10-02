@@ -1,0 +1,12 @@
+mawa:
+  project_name: "invalid-setup"
+  human_language: "en"
+  artifact_language: "en"
+  interaction_mode: "interactive"
+  execution_mode: "ide"
+state:
+  current_stage: "02-environment-setup"
+  active_module: null
+  setup_context: "first-approved-spec"
+workflow:
+  module_flow: "phase-by-phase"

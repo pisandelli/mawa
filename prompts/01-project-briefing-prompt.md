@@ -105,4 +105,4 @@ eliminate every open question. Do not emit the completion message until all are 
 
 End with:
 
-> Project Briefing is ready at `specs/briefing/project-briefing.md`. May I proceed to Stage 02 — Environment Setup?
+> Project Briefing is ready at `specs/briefing/project-briefing.md`. May I proceed to Stage 03 — Discovery?

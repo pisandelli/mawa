@@ -11,7 +11,7 @@ const stages = [
 ];
 const requiredBefore = {
   '01-project-briefing': ['inputs/raw-briefing.md'],
-  '02-environment-setup': ['specs/briefing/project-briefing.md'],
+  '02-environment-setup': ['specs/domain/domain-map.md', 'specs/domain/module-plan.md'],
   '03-discovery': ['specs/briefing/project-briefing.md'],
   '04-domain-architecture': ['specs/discovery/discovery.spec.md'],
   '05-module-spec': ['specs/domain/domain-map.md', 'specs/domain/module-plan.md'],
@@ -36,7 +36,14 @@ export function validate(rootDirectory) {
   const interaction = yamlValue(config, 'interaction_mode');
   if (interaction && !['interactive', 'continuous'].includes(interaction)) errors.push('mawa.interaction_mode must be interactive or continuous');
   const flow = yamlValue(config, 'module_flow');
-  if (flow && !['module-by-module', 'phase-by-phase'].includes(flow)) errors.push('workflow.module_flow must be module-by-module or phase-by-phase');
+  if (!flow) errors.push('missing workflow.module_flow; confirm module-by-module or phase-by-phase during Stage 00');
+  else if (!['module-by-module', 'phase-by-phase'].includes(flow)) errors.push('workflow.module_flow must be module-by-module or phase-by-phase');
+  const setupContext = yamlValue(config, 'setup_context');
+  if (stage === '02-environment-setup') {
+    if (!['first-approved-spec', 'all-specs'].includes(setupContext)) errors.push('Stage 02 requires state.setup_context from the approved module-plan gate');
+    if (setupContext === 'first-approved-spec' && flow !== 'module-by-module') errors.push('first-approved-spec setup context requires module-by-module flow');
+    if (setupContext === 'all-specs' && flow !== 'phase-by-phase') errors.push('all-specs setup context requires phase-by-phase flow');
+  }
   for (const artifact of requiredBefore[stage] || []) {
     if (!existsSync(resolve(root, artifact))) errors.push(`missing required artifact for ${stage}: ${artifact}`);
   }

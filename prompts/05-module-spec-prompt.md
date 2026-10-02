@@ -60,10 +60,12 @@ active_module:
 ```
 
 Update the module row in `specs/domain/module-plan.md` to `spec: approved`. In
-`module-by-module`, then update `state.current_stage` to `05a-design-handoff` or
-`06-implementation` according to the selected path. In `phase-by-phase`, return to
-`05-module-spec` for the next pending module; only after every spec passes may the design
-or implementation phase begin.
+`module-by-module`, if setup is not confirmed, set `state.setup_context:
+"first-approved-spec"` and `state.current_stage: "02-environment-setup"`. After setup,
+choose the design or implementation path for this module. In `phase-by-phase`, return to
+`05-module-spec` for the next pending module; only after every spec passes set
+`state.setup_context: "all-specs"` and enter Stage 02. Only after setup may the design or
+implementation phase begin.
 
 Do not treat unanswered implementation decisions as work to define on demand in Stage 06. Return to this stage for a blocking decision. In the approval summary, identify each decision as inherited, newly confirmed, assumption, non-blocking deferral, or blocker.
 

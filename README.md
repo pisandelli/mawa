@@ -82,6 +82,8 @@ Domain Map
   ↓
 Module Specs
   ↓
+Environment Setup (just-in-time)
+  ↓
 Design Handoff (optional)
   ↓
 Implementation
@@ -94,10 +96,10 @@ Stage protocols:
 ```text
 00-project-init.md
 01-project-briefing-prompt.md
-02-environment-setup-prompt.md
 03-discovery-prompt.md
 04-domain-architecture-prompt.md
 05-module-spec-prompt.md
+02-environment-setup-prompt.md
 05a-design-handoff-prompt.md
 06-implementation-prompt.md
 06a-implementation-from-approved-layout-prompt.md
@@ -107,6 +109,11 @@ Stage protocols:
 These files are stage protocols, not manual copy/paste steps.
 
 In normal use, MAWA may proceed from one stage to the next after human approval, depending on `interaction_mode`.
+
+For new applications, environment setup is deferred until the selected workflow mode has
+enough approved specifications: after the first spec in `module-by-module`, or after all
+planned specs in `phase-by-phase`. Existing applications are only inventoried read-only
+during initialization until that same setup gate is reached.
 
 ---
 

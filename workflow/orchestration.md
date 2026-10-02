@@ -7,13 +7,13 @@ MAWA stage order:
   ↓
 01 Project Briefing
   ↓
-02 Environment Setup
-  ↓
 03 Discovery
   ↓
 04 Domain Architecture
   ↓
 05 Module Spec
+  ↓
+02 Environment Setup (just-in-time; see flow mode)
   ↓
 05a Design Handoff   (optional — only if design.enabled = true and a layout is wanted)
   ↓
@@ -60,6 +60,18 @@ specs/discovery/discovery.spec.md
 ```
 
 The Raw Briefing is always the seed. Discovery must not run directly from an unstructured Raw Briefing unless the human explicitly bypasses Project Briefing.
+
+## Setup timing
+
+Stage 02 is deferred for a new application. It installs no app code before architecture and
+the required specs exist:
+
+- `module-by-module`: run Stage 02 after the first approved module spec, before that
+  module enters design or implementation.
+- `phase-by-phase`: run Stage 02 after every planned module spec is approved, before the
+  layout or implementation phase begins.
+- existing application: Stage 00 may inventory the selected app root read-only; Stage 02
+  still waits for the same gate before modifying setup.
 
 ## Design phase (optional)
 

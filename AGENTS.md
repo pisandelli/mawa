@@ -37,10 +37,10 @@ block is absent or stale.
 ```text
 00 Project Init
   → 01 Project Briefing
-  → 02 Environment Setup
   → 03 Discovery
   → 04 Domain Architecture
   → 05 Module Spec
+  → 02 Environment Setup (just-in-time; varies by flow mode)
   → (optional) 05a Design Handoff   ← standby on the design tool until layout approved
   → 06 Implementation  OR  06a Implementation From Approved Layout
   → 07 Review & Validation
