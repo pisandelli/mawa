@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MAWA manifest",
+  "type": "object",
+  "required": ["schemaVersion", "engine", "project", "language", "stack", "workflowPreference"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "engine": { "type": "object", "required": ["name", "version"] },
+    "project": { "type": "object", "required": ["name", "root", "documentationRoot"] },
+    "language": { "type": "object", "required": ["interaction", "documentation", "code"] },
+    "stack": { "type": ["object", "null"] },
+    "workflowPreference": { "type": ["string", "null"] }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MAWA decision",
+  "type": "object",
+  "required": ["schemaVersion", "id", "gate", "decision", "approvedAt", "fromStage", "toStage", "evidence", "commitRequired"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "decision": { "const": "approved" },
+    "evidence": { "type": "array" },
+    "commitRequired": { "const": true }
+  }
+}

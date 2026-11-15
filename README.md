@@ -1,9 +1,27 @@
 # MAWA
-### AI-Native Operating Workflow for Nuxt 4 Applications
+### Governed workflow for accountable AI-assisted delivery
 
-MAWA is an AI-native operating workflow for building Nuxt 4 applications through governed discovery, architecture, specification, implementation, and validation stages.
+> **CLI foundation in progress.** The first executable MAWA increment adds an
+> auditable project bootstrap: `mawa init`, `mawa status`, `mawa next`,
+> `mawa context`, raw-briefing capture, approval, and audit. The workflow below is
+> the v1 behavioral reference while the remaining stages become runtime-enforced.
 
-It is not framework-agnostic. Nuxt 4 is the core runtime assumption.
+## Start a governed project
+
+From a Git repository with `user.name` and `user.email` configured:
+
+```bash
+mawa init
+```
+
+MAWA guides the initial choices, creates `docs/mawa/` for human-readable artifacts
+and `.mawa/` for operational state, then asks how you want to provide the Raw Briefing.
+Run `mawa next` whenever you need the next required action. The default experience is
+interactive; automation flags will remain optional.
+
+MAWA is an AI-native operating workflow for governed discovery, architecture, specification, implementation, and validation. Its new CLI core is framework-agnostic; stack-specific behavior will be supplied by versioned templates.
+
+Nuxt 4 remains the first certified template and the legacy v1 reference below is Nuxt-focused.
 
 **Entry point:** any AI agent (Claude, Codex, Cursor, …) should read [`AGENTS.md`](AGENTS.md) first. It is the tool-neutral boot and orchestration guide. `CLAUDE.md` only points there.
 
@@ -43,9 +61,8 @@ Known limitations (read before adopting):
   planned placeholders, not production-ready.
 - **The default UI stack is itself pre-1.0.** `@pisandelli/daredash` ships as a beta
   package; its component API and `llms.txt` may change.
-- **No runtime enforcement.** Stage chaining, the `state` machine, and the per-stage
-  Definition-of-Done gates are followed by the agent reading `AGENTS.md` — they are not
-  enforced by a runtime/hook. A weaker model may still drift.
+- **Runtime enforcement is incremental.** The CLI currently enforces the initialization
+  and Raw Briefing gates; the remaining v1 stages are being migrated in sequence.
 - **The full design path is unproven.** The optional `05a` design handoff (with a live
   design-tool MCP such as Pencil) has not been exercised end-to-end; the skip path has.
 
