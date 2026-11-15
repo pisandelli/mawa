@@ -2,8 +2,9 @@
 ### Governed workflow for accountable AI-assisted delivery
 
 > **CLI foundation in progress.** The first executable MAWA increment adds an
-> auditable project bootstrap: `mawa init`, `mawa status`, `mawa next`,
-> `mawa context`, raw-briefing capture, approval, and audit. The workflow below is
+> auditable project bootstrap and critical briefing: `mawa init`, `mawa status`,
+> `mawa next`, `mawa context`, Raw Briefing capture, a guided interview ledger,
+> approval, and audit. The workflow below is
 > the v1 behavioral reference while the remaining stages become runtime-enforced.
 
 ## Start a governed project
@@ -61,8 +62,9 @@ Known limitations (read before adopting):
   planned placeholders, not production-ready.
 - **The default UI stack is itself pre-1.0.** `@pisandelli/daredash` ships as a beta
   package; its component API and `llms.txt` may change.
-- **Runtime enforcement is incremental.** The CLI currently enforces the initialization
-  and Raw Briefing gates; the remaining v1 stages are being migrated in sequence.
+- **Runtime enforcement is incremental.** The CLI currently enforces initialization,
+  Raw Briefing, and critical Project Brief gates; the remaining v1 stages are being
+  migrated in sequence.
 - **The full design path is unproven.** The optional `05a` design handoff (with a live
   design-tool MCP such as Pencil) has not been exercised end-to-end; the skip path has.
 
