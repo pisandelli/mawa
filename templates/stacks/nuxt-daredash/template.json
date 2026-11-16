@@ -7,8 +7,26 @@
   "runtime": { "node": ">=20.19.0" },
   "packageManager": "pnpm",
   "framework": { "name": "nuxt", "major": 4 },
+  "versionPolicy": {
+    "directDependencies": "exact",
+    "verifiedAt": "2026-11-16",
+    "nuxt": "4.6.4",
+    "pinia": "4.1.0",
+    "piniaNuxt": "1.0.3",
+    "vueuseNuxt": "15.0.0",
+    "nuxtEslint": "1.17.0",
+    "eslint": "10.15.0"
+  },
   "uiLibrary": {
     "name": "@pisandelli/daredash",
+    "distribution": {
+      "kind": "git",
+      "repository": "https://github.com/pisandelli/daredash.git",
+      "tag": "v0.0.54-beta",
+      "commit": "328e7ef5fff7536043e2235d463f291b2ba3fced",
+      "specifier": "github:pisandelli/daredash#328e7ef5fff7536043e2235d463f291b2ba3fced",
+      "version": "0.0.54-beta"
+    },
     "instructions": {
       "precedence": ["AGENTS.md", "SKILL.md", "llms.txt"],
       "localCandidates": ["node_modules/@pisandelli/daredash/AGENTS.md", "node_modules/@pisandelli/daredash/SKILL.md", "node_modules/@pisandelli/daredash/llms.txt"],

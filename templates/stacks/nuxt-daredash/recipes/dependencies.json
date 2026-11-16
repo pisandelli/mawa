@@ -2,10 +2,11 @@
   "id": "install-nuxt-daredash-baseline",
   "approval": "explicit-per-recipe",
   "commands": [
-    { "executable": "pnpm", "arguments": ["add", "@pinia/nuxt", "@vueuse/nuxt", "@pisandelli/daredash"] },
-    { "executable": "pnpm", "arguments": ["add", "-D", "@nuxt/eslint", "eslint"] },
+    { "executable": "pnpm", "arguments": ["add", "-E", "nuxt@4.6.4", "@pinia/nuxt@1.0.3", "pinia@4.1.0", "@vueuse/nuxt@15.0.0"] },
+    { "executable": "pnpm", "arguments": ["add", "-E", "-D", "@nuxt/eslint@1.17.0", "eslint@10.15.0"] },
+    { "executable": "pnpm", "arguments": ["add", "-E", "github:pisandelli/daredash#328e7ef5fff7536043e2235d463f291b2ba3fced"] },
     { "when": { "templateLanguage": "pug" }, "executable": "pnpm", "arguments": ["add", "-D", "pug", "@types/pug", "@vue/language-plugin-pug"] }
   ],
-  "effects": ["Adds the MAWA baseline and DareDash public package"],
-  "recovery": "Keep the lockfile. If a package resolution fails, record the output and revise the plan; do not substitute packages automatically."
+  "effects": ["Pins the MAWA baseline to the certified versions", "Adds DareDash from its verified Git tag commit"],
+  "recovery": "Keep the lockfile. If a package resolution fails, record the output and revise the plan; do not substitute package versions or sources automatically."
 }

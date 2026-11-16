@@ -16,6 +16,9 @@ test('lists and loads the certified Nuxt + DareDash stack contract', () => {
   assert.equal(stack.packageManager, 'pnpm');
   assert.equal(stack.profile.id, 'corporate-default');
   assert.deepEqual(stack.uiLibrary.instructions.precedence, ['AGENTS.md', 'SKILL.md', 'llms.txt']);
+  assert.equal(stack.versionPolicy.nuxt, '4.6.4');
+  assert.equal(stack.uiLibrary.distribution.tag, 'v0.0.54-beta');
+  assert.match(stack.uiLibrary.distribution.specifier, /328e7ef5fff7536043e2235d463f291b2ba3fced/);
 });
 
 test('doctor classifies the Nuxt stack fixtures without changing them', () => {
@@ -26,6 +29,18 @@ test('doctor classifies the Nuxt stack fixtures without changing them', () => {
     assert.equal(report.baseline, expected.baseline, name);
     assert.equal(report.config.status, expected.configuration, name);
   }
+});
+
+test('existing-valid fixture stays aligned with the certified version policy', () => {
+  const stack = loadStackTemplate('nuxt-daredash');
+  const fixturePackage = JSON.parse(readFileSync(resolve(fixture('existing-valid'), 'package.json'), 'utf8'));
+  assert.equal(fixturePackage.dependencies.nuxt, stack.versionPolicy.nuxt);
+  assert.equal(fixturePackage.dependencies.pinia, stack.versionPolicy.pinia);
+  assert.equal(fixturePackage.dependencies['@pinia/nuxt'], stack.versionPolicy.piniaNuxt);
+  assert.equal(fixturePackage.dependencies['@vueuse/nuxt'], stack.versionPolicy.vueuseNuxt);
+  assert.equal(fixturePackage.dependencies['@pisandelli/daredash'], stack.uiLibrary.distribution.specifier);
+  assert.equal(fixturePackage.devDependencies['@nuxt/eslint'], stack.versionPolicy.nuxtEslint);
+  assert.equal(fixturePackage.devDependencies.eslint, stack.versionPolicy.eslint);
 });
 
 test('doctor only runs at the setup stage and never writes a report', () => {
