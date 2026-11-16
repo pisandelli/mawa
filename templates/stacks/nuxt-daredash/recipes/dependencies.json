@@ -1,0 +1,11 @@
+{
+  "id": "install-nuxt-daredash-baseline",
+  "approval": "explicit-per-recipe",
+  "commands": [
+    { "executable": "pnpm", "arguments": ["add", "@pinia/nuxt", "@vueuse/nuxt", "@pisandelli/daredash"] },
+    { "executable": "pnpm", "arguments": ["add", "-D", "@nuxt/eslint", "eslint"] },
+    { "when": { "templateLanguage": "pug" }, "executable": "pnpm", "arguments": ["add", "-D", "pug", "@types/pug", "@vue/language-plugin-pug"] }
+  ],
+  "effects": ["Adds the MAWA baseline and DareDash public package"],
+  "recovery": "Keep the lockfile. If a package resolution fails, record the output and revise the plan; do not substitute packages automatically."
+}

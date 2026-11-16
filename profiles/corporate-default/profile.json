@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "corporate-default",
+  "version": "0.1.0",
+  "label": "Corporate default",
+  "commandPolicy": {
+    "shellFree": true,
+    "allowedExecutables": ["pnpm", "git"],
+    "approvalRequiredForEveryRecipe": true,
+    "forbidden": ["curl", "wget", "sh", "bash", "powershell"]
+  },
+  "git": {
+    "approvalCommitPrefix": "mawa:",
+    "requireCleanTargetPaths": true
+  },
+  "documentation": {
+    "codeLanguage": "en",
+    "humanLanguageFromManifest": true
+  }
+}

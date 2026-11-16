@@ -1,0 +1,16 @@
+{
+  "id": "nuxt-config-baseline",
+  "target": "nuxt.config.ts",
+  "strategy": "ast-merge-required",
+  "neverOverwrite": true,
+  "requiresHumanReview": true,
+  "modules": ["@nuxt/eslint", "@vueuse/nuxt", "@pinia/nuxt", "@pisandelli/daredash"],
+  "requiredOptions": {
+    "typescript.strict": true,
+    "pinia.storesDirs": ["./app/stores/**"],
+    "daredash.prefix": "dd",
+    "daredash.debug": false
+  },
+  "conflicts": ["unparseable-config", "dynamic-modules-expression", "duplicate-module-with-incompatible-options"],
+  "recovery": "Generate a unified patch only. If the configuration cannot be merged safely, block execution and show the conflict."
+}

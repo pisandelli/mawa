@@ -1,0 +1,10 @@
+{
+  "id": "nuxt-daredash-baseline-validation",
+  "commands": [
+    { "id": "typecheck", "executable": "pnpm", "arguments": ["exec", "nuxi", "typecheck"] },
+    { "id": "lint", "executable": "pnpm", "arguments": ["exec", "eslint", "."] },
+    { "id": "test", "executable": "pnpm", "arguments": ["test"], "optional": true }
+  ],
+  "route": { "path": "/", "requires": "app/pages/index.vue", "expectStatus": 200 },
+  "evidence": ["command-result", "route-result", "resolved-ui-instructions"]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "scaffold-nuxt-minimal",
+  "when": { "projectKind": "new" },
+  "approval": "explicit-per-recipe",
+  "command": {
+    "executable": "pnpm",
+    "arguments": ["create", "nuxt@latest", "{{appRoot}}", "--template", "minimal", "--packageManager", "pnpm", "--no-gitInit"]
+  },
+  "source": "https://nuxt.com/docs/4.x/api/commands/init",
+  "effects": ["Creates a Nuxt project in appRoot", "Installs the scaffold dependencies"],
+  "recovery": "Stop if appRoot is not empty. Do not use --force; inspect the conflict and create a new plan."
+}

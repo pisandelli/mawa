@@ -1,0 +1,15 @@
+{
+  "name": "existing-valid",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "dependencies": {
+    "nuxt": "^4.0.0",
+    "@pinia/nuxt": "^0.11.0",
+    "@vueuse/nuxt": "^13.0.0",
+    "@pisandelli/daredash": "^0.1.0"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^1.0.0",
+    "eslint": "^9.0.0"
+  }
+}

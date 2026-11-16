@@ -4,6 +4,7 @@ import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
 import { basename, resolve } from 'node:path';
 import { approveCurrentGate, auditProject, getContext, getNext, getStatus, initProject, isGitRepository, MawaError, rawBriefingPath, replaceRawBriefing } from '../lib/project-core.mjs';
+import { doctorProject, listStackTemplates } from '../lib/stack-core.mjs';
 import { validateLegacy } from '../lib/legacy-validator.mjs';
 
 export const validate = validateLegacy;
@@ -20,7 +21,7 @@ function parse(argv) {
 }
 
 function usage() {
-  console.log(`MAWA\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa context [--json]\n  mawa approve [--comment TEXT]\n  mawa audit\n\nLegacy compatibility:\n  mawa validate [project-directory]\n`);
+  console.log(`MAWA\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa context [--json]\n  mawa approve [--comment TEXT]\n  mawa doctor [--stack ID] [--app-root PATH]\n  mawa stack list\n  mawa audit\n\nLegacy compatibility:\n  mawa validate [project-directory]\n`);
 }
 
 function askInterface() { return createInterface({ input: stdin, output: stdout }); }
@@ -137,6 +138,18 @@ export async function runCli(argv = process.argv.slice(2)) {
   }
   if (command === 'context') return console.log(JSON.stringify(getContext(root), null, 2));
   if (command === 'approve') return approveCommand(options);
+  if (command === 'stack' && positionals[1] === 'list') {
+    const stacks = listStackTemplates();
+    if (options.json) return console.log(JSON.stringify(stacks.map(({ directory, profile, ...stack }) => ({ ...stack, profile: profile.id })), null, 2));
+    console.log(`\nStacks disponíveis:\n${stacks.map((stack) => `- ${stack.id} (${stack.version}): ${stack.label}`).join('\n')}`);
+    return;
+  }
+  if (command === 'doctor') {
+    const report = doctorProject(root, { stack: options.stack, appRoot: options['app-root'] });
+    if (options.json) return console.log(JSON.stringify(report, null, 2));
+    console.log(`\nMAWA doctor — ${report.template.label}\n\nApp root: ${report.appRoot}\nTipo de projeto: ${report.projectKind}\nBaseline: ${report.baseline}\nConfiguração Nuxt: ${report.config.status}\nPágina /: ${report.landingPage.exists ? 'encontrada' : 'ausente'}\nPacotes ausentes: ${report.missingPackages.length ? report.missingPackages.join(', ') : 'nenhum'}\nInstruções DareDash locais: ${report.uiInstructions.resolvedLocalFiles.length ? report.uiInstructions.resolvedLocalFiles.join(', ') : 'não encontradas; use a fonte oficial registrada'}\n\nEste diagnóstico não alterou arquivos. O próximo incremento transformará este resultado em um plano de setup aprovável.`);
+    return;
+  }
   if (command === 'audit') {
     const issues = auditProject(root);
     if (issues.length) { issues.forEach((issue) => console.error(`error: ${issue}`)); process.exitCode = 1; }

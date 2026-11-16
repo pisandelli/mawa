@@ -7,6 +7,11 @@
 > approval, and audit. The workflow below is
 > the v1 behavioral reference while the remaining stages become runtime-enforced.
 
+The first certified stack contract is `nuxt-daredash`. It contains declared recipes,
+patch safety rules, validations, UI-library instruction precedence, and test fixtures.
+At the setup stage, `mawa doctor` inspects the project without changing it. Applying a
+setup plan remains a later, explicitly approved increment.
+
 ## Start a governed project
 
 From a Git repository with `user.name` and `user.email` configured:

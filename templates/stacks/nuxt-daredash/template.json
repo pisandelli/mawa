@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "nuxt-daredash",
+  "version": "0.1.0",
+  "label": "Nuxt 4 + DareDash",
+  "profile": "corporate-default",
+  "runtime": { "node": ">=20.19.0" },
+  "packageManager": "pnpm",
+  "framework": { "name": "nuxt", "major": 4 },
+  "uiLibrary": {
+    "name": "@pisandelli/daredash",
+    "instructions": {
+      "precedence": ["AGENTS.md", "SKILL.md", "llms.txt"],
+      "localCandidates": ["node_modules/@pisandelli/daredash/AGENTS.md", "node_modules/@pisandelli/daredash/SKILL.md", "node_modules/@pisandelli/daredash/llms.txt"],
+      "remoteSource": "https://raw.githubusercontent.com/pisandelli/daredash/main/llms.txt",
+      "rules": "agent-guides/daredash-instructions.md"
+    }
+  },
+  "recipes": ["recipes/scaffold.json", "recipes/dependencies.json"],
+  "patches": ["patches/nuxt-config.json"],
+  "validations": ["validations/baseline.json"],
+  "conventions": ["conventions/vue-sfc.md", "conventions/typescript.md"],
+  "fixtures": ["fixtures/new-nuxt", "fixtures/existing-valid", "fixtures/nuxt-config-conflict"]
+}
