@@ -35,6 +35,11 @@ At every supported stage transition, MAWA also writes an agent handoff in
 another agent; it specifies only the required context, permitted actions, and the next
 human gate.
 
+In an interactive terminal, MAWA uses guided prompts and offers to start a local Codex
+session with the active handoff after approval. This is always opt-in and preserves the
+Codex session's normal approval and sandbox controls. Use `mawa handoff --start-codex`
+to start it explicitly.
+
 MAWA is an AI-native operating workflow for governed discovery, architecture, specification, implementation, and validation. Its new CLI core is framework-agnostic; stack-specific behavior will be supplied by versioned templates.
 
 Nuxt 4 remains the first certified template and the legacy v1 reference below is Nuxt-focused.
