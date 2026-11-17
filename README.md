@@ -12,6 +12,11 @@ patch safety rules, validations, UI-library instruction precedence, and test fix
 At the setup stage, `mawa doctor` inspects the project without changing it. Applying a
 setup plan remains a later, explicitly approved increment.
 
+`mawa setup` is the guided path: it records the app directory, template language, UI
+options, diagnostic, and frozen stack/profile snapshot in a human-readable setup plan.
+It changes no application code or dependencies; `mawa approve` records the human plan
+approval before a future execution stage can begin.
+
 ## Start a governed project
 
 From a Git repository with `user.name` and `user.email` configured:

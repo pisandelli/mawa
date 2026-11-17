@@ -4,7 +4,7 @@ import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
 import { basename, resolve } from 'node:path';
 import { approveCurrentGate, auditProject, getContext, getNext, getStatus, initProject, isGitRepository, MawaError, rawBriefingPath, replaceRawBriefing } from '../lib/project-core.mjs';
-import { doctorProject, listStackTemplates } from '../lib/stack-core.mjs';
+import { createSetupPlan, doctorProject, listStackTemplates } from '../lib/stack-core.mjs';
 import { validateLegacy } from '../lib/legacy-validator.mjs';
 
 export const validate = validateLegacy;
@@ -21,7 +21,7 @@ function parse(argv) {
 }
 
 function usage() {
-  console.log(`MAWA\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa context [--json]\n  mawa approve [--comment TEXT]\n  mawa doctor [--stack ID] [--app-root PATH]\n  mawa stack list\n  mawa audit\n\nLegacy compatibility:\n  mawa validate [project-directory]\n`);
+  console.log(`MAWA\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa context [--json]\n  mawa approve [--comment TEXT]\n  mawa doctor [--stack ID] [--app-root PATH]\n  mawa setup [--stack ID] [--app-root PATH] [--template-language pug|html]\n  mawa stack list\n  mawa audit\n\nLegacy compatibility:\n  mawa validate [project-directory]\n`);
 }
 
 function askInterface() { return createInterface({ input: stdin, output: stdout }); }
@@ -118,6 +118,26 @@ async function approveCommand(options) {
   console.log(`Aprovação registrada. Etapa atual: ${result.currentStage}\nDecisão: ${result.decision}`);
 }
 
+async function setupCommand(options) {
+  const root = resolve(options.root || '.');
+  let stack = options.stack || 'nuxt-daredash';
+  let appRoot = options['app-root'] || 'web';
+  let templateLanguage = options['template-language'] === 'html' ? 'html' : 'pug';
+  let prefix = options.prefix || 'dd';
+  let debug = options.debug === true;
+  if (isInteractive(options)) {
+    const stacks = listStackTemplates();
+    stack = await choose('Selecione a stack', stacks.map((item) => ({ label: `${item.label} (${item.id})`, value: item.id })));
+    appRoot = await answer('Diretório da aplicação, relativo ao projeto', appRoot);
+    templateLanguage = await choose('Linguagem de template', [{ label: 'Pug', value: 'pug' }, { label: 'HTML', value: 'html' }]);
+    prefix = await answer('Prefixo público do DareDash', prefix);
+    debug = await confirm('Ativar debug do DareDash?', false);
+    if (!await confirm('Gerar o diagnóstico e o plano de setup? Nenhuma dependência será instalada.', true)) return console.log('Setup cancelado. Nenhum arquivo foi alterado.');
+  }
+  const result = createSetupPlan(root, { stack, appRoot, templateLanguage, ui: { prefix, debug } });
+  console.log(`\nPlano de setup criado.\n\nDiagnóstico: ${result.doctor}\nPlano: ${result.plan}\n\nRevise as versões, as receitas, a origem do DareDash e a política de patch. Execute “mawa approve” somente quando aprovar o plano.`);
+}
+
 export async function runCli(argv = process.argv.slice(2)) {
   const { positionals, options } = parse(argv);
   const command = positionals[0];
@@ -138,6 +158,7 @@ export async function runCli(argv = process.argv.slice(2)) {
   }
   if (command === 'context') return console.log(JSON.stringify(getContext(root), null, 2));
   if (command === 'approve') return approveCommand(options);
+  if (command === 'setup') return setupCommand(options);
   if (command === 'stack' && positionals[1] === 'list') {
     const stacks = listStackTemplates();
     if (options.json) return console.log(JSON.stringify(stacks.map(({ directory, profile, ...stack }) => ({ ...stack, profile: profile.id })), null, 2));
@@ -147,7 +168,7 @@ export async function runCli(argv = process.argv.slice(2)) {
   if (command === 'doctor') {
     const report = doctorProject(root, { stack: options.stack, appRoot: options['app-root'] });
     if (options.json) return console.log(JSON.stringify(report, null, 2));
-    console.log(`\nMAWA doctor — ${report.template.label}\n\nApp root: ${report.appRoot}\nTipo de projeto: ${report.projectKind}\nBaseline: ${report.baseline}\nConfiguração Nuxt: ${report.config.status}\nPágina /: ${report.landingPage.exists ? 'encontrada' : 'ausente'}\nPacotes ausentes: ${report.missingPackages.length ? report.missingPackages.join(', ') : 'nenhum'}\nInstruções DareDash locais: ${report.uiInstructions.resolvedLocalFiles.length ? report.uiInstructions.resolvedLocalFiles.join(', ') : 'não encontradas; use a fonte oficial registrada'}\n\nEste diagnóstico não alterou arquivos. O próximo incremento transformará este resultado em um plano de setup aprovável.`);
+    console.log(`\nMAWA doctor — ${report.template.label}\n\nApp root: ${report.appRoot}\nTipo de projeto: ${report.projectKind}\nBaseline: ${report.baseline}\nConfiguração Nuxt: ${report.config.status}\nPágina /: ${report.landingPage.exists ? 'encontrada' : 'ausente'}\nPacotes ausentes: ${report.missingPackages.length ? report.missingPackages.join(', ') : 'nenhum'}\nInstruções DareDash locais: ${report.uiInstructions.resolvedLocalFiles.length ? report.uiInstructions.resolvedLocalFiles.join(', ') : 'não encontradas; use a fonte oficial registrada'}\n\nEste diagnóstico não alterou arquivos. Execute “mawa setup” para criar um plano de setup revisável.`);
     return;
   }
   if (command === 'audit') {

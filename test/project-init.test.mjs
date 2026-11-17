@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { approveCurrentGate, auditProject, getContext, getNext, getStatus, initProject, replaceRawBriefing, validateCriticalBriefing, validateRawBriefing } from '../lib/project-core.mjs';
+import { createSetupPlan } from '../lib/stack-core.mjs';
 
 function project() {
   const root = mkdtempSync(resolve(tmpdir(), 'mawa-init-'));
@@ -211,6 +212,48 @@ test('audit detects a project brief changed after the briefing approval', () => 
   } finally { cleanup(root); }
 });
 
+test('creates, freezes, and approves a setup plan before setup execution', () => {
+  const root = project();
+  try {
+    initProject(root);
+    replaceRawBriefing(root, briefing());
+    approveCurrentGate(root);
+    writeFileSync(resolve(root, 'docs/mawa/interviews/critical-briefing.md'), criticalInterview());
+    writeFileSync(resolve(root, 'docs/mawa/analysis/project-brief.md'), projectBrief());
+    approveCurrentGate(root);
+    const result = createSetupPlan(root, { templateLanguage: 'pug', ui: { prefix: 'dd', debug: false } });
+    assert.equal(result.selection.templateLanguage, 'pug');
+    assert.equal(result.selection.appRoot, 'web');
+    assert.ok(existsSync(resolve(root, result.plan)));
+    assert.ok(existsSync(resolve(root, result.doctor)));
+    assert.ok(existsSync(resolve(root, '.mawa/snapshots/stacks/nuxt-daredash@0.1.0/template/template.json')));
+    assert.equal(getStatus(root).nextApproval, 'setup-plan');
+    assert.match(getNext(root).instructions.join('\n'), /setup-plan/);
+    const approval = approveCurrentGate(root, 'The setup plan was reviewed by a human.');
+    assert.equal(approval.currentStage, 'setup-apply');
+    assert.equal(auditProject(root).length, 0);
+    const manifest = JSON.parse(readFileSync(resolve(root, '.mawa/manifest.json'), 'utf8'));
+    assert.equal(manifest.stack.id, 'nuxt-daredash');
+    assert.equal(manifest.stack.templateLanguage, 'pug');
+  } finally { cleanup(root); }
+});
+
+test('blocks a setup plan whose Nuxt configuration cannot be safely patched', () => {
+  const root = project();
+  try {
+    initProject(root);
+    replaceRawBriefing(root, briefing());
+    approveCurrentGate(root);
+    writeFileSync(resolve(root, 'docs/mawa/interviews/critical-briefing.md'), criticalInterview());
+    writeFileSync(resolve(root, 'docs/mawa/analysis/project-brief.md'), projectBrief());
+    approveCurrentGate(root);
+    writeFileSync(resolve(root, 'nuxt.config.ts'), 'const modules = getModulesFromEnvironment()\nexport default defineNuxtConfig({ modules })\n');
+    createSetupPlan(root, { appRoot: '.' });
+    assert.throws(() => approveCurrentGate(root), /configuration conflict/);
+    assert.equal(getStatus(root).currentStage, 'setup');
+  } finally { cleanup(root); }
+});
+
 test('preserves an existing AGENTS.md unless explicit append is requested', () => {
   const root = project();
   try {
@@ -229,6 +272,15 @@ test('audit detects approved evidence modified after approval', () => {
     approveCurrentGate(root);
     writeFileSync(resolve(root, 'docs/mawa/intake/raw-briefing.md'), '# Changed\n');
     assert.match(auditProject(root).join('\n'), /Approved evidence changed/);
+  } finally { cleanup(root); }
+});
+
+test('audit detects an approval decision that has not been committed', () => {
+  const root = project();
+  try {
+    initProject(root);
+    writeFileSync(resolve(root, '.mawa/decisions/uncommitted.json'), JSON.stringify({ schemaVersion: 1, id: 'uncommitted', commitRequired: true, evidence: [] }));
+    assert.match(auditProject(root).join('\n'), /Decision is not committed: uncommitted.json/);
   } finally { cleanup(root); }
 });
 
