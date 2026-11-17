@@ -6,7 +6,7 @@ import { stdin, stdout } from 'node:process';
 import { basename, resolve } from 'node:path';
 import { parseArgs } from 'citty';
 import { cancel, confirm as clackConfirm, intro, isCancel, log, outro, select, spinner, text } from '@clack/prompts';
-import { approveCurrentGate, auditProject, getAgentHandoff, getContext, getNext, getStatus, initProject, isGitRepository, MawaError, rawBriefingPath, replaceRawBriefing } from '../lib/project-core.mjs';
+import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getContext, getNext, getStatus, initProject, isGitRepository, MawaError, rawBriefingPath, replaceRawBriefing, validateRawBriefing } from '../lib/project-core.mjs';
 import { createSetupPlan, doctorProject, listStackTemplates } from '../lib/stack-core.mjs';
 import { validateLegacy } from '../lib/legacy-validator.mjs';
 
@@ -23,7 +23,7 @@ function parse(argv) {
 }
 
 function usage() {
-  console.log(`MAWA — MAWA Advances Work Accountably\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa context [--json]\n  mawa handoff [--start-codex]\n  mawa approve [--comment TEXT] [--start-codex]\n  mawa doctor [--stack ID] [--app-root PATH]\n  mawa setup [--stack ID] [--app-root PATH] [--template-language pug|html]\n  mawa stack list\n  mawa audit\n\nUse --json for machine-readable output.\n\nLegacy compatibility:\n  mawa validate [project-directory]\n`);
+  console.log(`MAWA — MAWA Advances Work Accountably\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa context [--json]\n  mawa handoff [--start-codex]\n  mawa approve [--comment TEXT] [--start-codex]\n  mawa abort\n  mawa doctor [--stack ID] [--app-root PATH]\n  mawa setup [--stack ID] [--app-root PATH] [--template-language pug|html]\n  mawa stack list\n  mawa audit\n\nUse --json for machine-readable output.\n\nLegacy compatibility:\n  mawa validate [project-directory]\n`);
 }
 
 function askInterface() { return createInterface({ input: stdin, output: stdout }); }
@@ -93,8 +93,7 @@ async function initCommand(directory, options) {
   task?.stop('Projeto MAWA inicializado');
   if (isInteractive(options)) {
     log.info(`Raw Briefing: ${rawBriefingPath(root)}`);
-    log.step('Revise o Raw Briefing, execute mawa next e aprove somente quando estiver satisfeito.');
-    return outro(`Etapa atual: ${result.state.currentStage}`);
+    return rawBriefingMenu(root, options);
   }
   console.log(`\nProjeto MAWA inicializado.\n\nRaw briefing: ${rawBriefingPath(root)}\nEstado atual: ${result.state.currentStage}\n\nPróximo passo:\n1. Revise e complete o raw briefing.\n2. Execute “mawa next” para ver os critérios.\n3. Execute “mawa approve” somente quando estiver satisfeito.`);
 }
@@ -120,6 +119,52 @@ async function intakeCommand(options) {
 
 export function codexHandoffPrompt(handoffPath) {
   return `Continue este projeto MAWA. Leia ${handoffPath} primeiro, depois execute mawa status e mawa context. Siga o handoff integralmente, respeite os gates humanos e não avance para outra etapa. Comece pela primeira ação esperada no handoff.`;
+}
+
+function showRawBriefingCriteria(root) {
+  const errors = validateRawBriefing(root);
+  if (!errors.length) {
+    log.success('O Raw Briefing atende aos critérios mínimos para aprovação. Revise o conteúdo antes de confirmar.');
+    return true;
+  }
+  log.warn('O Raw Briefing ainda não pode ser aprovado:');
+  errors.forEach((error) => log.message(`• ${error}`));
+  return false;
+}
+
+async function rawBriefingMenu(root, options) {
+  while (true) {
+    const action = await choose('Raw Briefing registrado. O que deseja fazer agora?', [
+      { label: 'Aprovar e iniciar entrevista crítica', value: 'approve', hint: 'valida o briefing e abre a próxima etapa' },
+      { label: 'Editar ou complementar depois', value: 'edit', hint: 'mantém o projeto pronto para continuar' },
+      { label: 'Exibir critérios de aprovação', value: 'criteria', hint: 'mostra o que ainda precisa ser resolvido' },
+      { label: 'Abortar inicialização deste projeto', value: 'abort', hint: 'remove apenas os artefatos iniciais do MAWA' },
+    ]);
+    if (action === 'edit') return outro('Edite o Raw Briefing quando quiser. Depois execute “mawa approve” para continuar.');
+    if (action === 'criteria') {
+      showRawBriefingCriteria(root);
+      continue;
+    }
+    if (action === 'approve') {
+      if (!showRawBriefingCriteria(root)) continue;
+      if (!await confirm('Você revisou o Raw Briefing e confirma a aprovação?', false)) continue;
+      const task = spinner();
+      task.start('Registrando aprovação auditável');
+      const result = approveCurrentGate(root, options.comment || null);
+      task.stop('Aprovação registrada');
+      const handoff = getAgentHandoff(root);
+      log.success(`Etapa atual: ${result.currentStage}`);
+      log.info(`Handoff do agente: ${handoff.path}`);
+      await offerCodex(root, handoff, options);
+      return outro('A entrevista crítica está pronta para ser conduzida pelo agente.');
+    }
+    if (!await confirm('Abortar a inicialização? O MAWA registrará uma reversão recuperável no Git.', false)) continue;
+    const task = spinner();
+    task.start('Removendo os artefatos iniciais do MAWA');
+    const result = abortInitialization(root);
+    task.stop('Inicialização abortada e registrada');
+    return outro(`Os artefatos iniciais foram removidos. Commit de recuperação: ${result.commit}`);
+  }
 }
 
 async function offerCodex(root, handoff, options) {
@@ -151,6 +196,20 @@ async function approveCommand(options) {
   }
   console.log(`Aprovação registrada. Etapa atual: ${result.currentStage}\nDecisão: ${result.decision}\n\nPróxima ação para o agente:\nLeia ${handoff.path} ou execute “mawa handoff” para exibir o handoff completo.`);
   if (options['start-codex'] === true) await offerCodex(root, handoff, options);
+}
+
+async function abortCommand(options) {
+  const root = resolve(options.root || '.');
+  if (isInteractive(options)) {
+    intro('MAWA — abortar inicialização');
+    if (!await confirm('Abortar a inicialização ainda não aprovada? O Git registrará uma reversão recuperável.', false)) return cancel('Aborto cancelado. Nenhum arquivo foi alterado.');
+  }
+  const task = isInteractive(options) ? spinner() : null;
+  task?.start('Removendo os artefatos iniciais do MAWA');
+  const result = abortInitialization(root);
+  task?.stop('Inicialização abortada e registrada');
+  if (isInteractive(options)) return outro(`Os artefatos iniciais foram removidos. Commit de recuperação: ${result.commit}`);
+  console.log(`Inicialização MAWA abortada. Commit de recuperação: ${result.commit}`);
 }
 
 async function setupCommand(options) {
@@ -209,6 +268,7 @@ export async function runCli(argv = process.argv.slice(2)) {
     return;
   }
   if (command === 'approve') return approveCommand(options);
+  if (command === 'abort') return abortCommand(options);
   if (command === 'setup') return setupCommand(options);
   if (command === 'stack' && positionals[1] === 'list') {
     const stacks = listStackTemplates();

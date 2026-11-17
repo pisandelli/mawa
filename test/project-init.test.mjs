@@ -4,7 +4,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
-import { approveCurrentGate, auditProject, getAgentHandoff, getContext, getNext, getStatus, initProject, replaceRawBriefing, validateCriticalBriefing, validateRawBriefing } from '../lib/project-core.mjs';
+import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getContext, getNext, getStatus, initProject, replaceRawBriefing, validateCriticalBriefing, validateRawBriefing } from '../lib/project-core.mjs';
 import { createSetupPlan } from '../lib/stack-core.mjs';
 
 function project() {
@@ -143,6 +143,40 @@ test('initializes a documented, auditable project with a raw briefing', () => {
     assert.match(readFileSync(resolve(root, 'AGENTS.md'), 'utf8'), /mawa status/);
     assert.equal(getStatus(root).nextApproval, 'raw-briefing');
     assert.match(getNext(root).instructions.join('\n'), /Não crie uma especificação ainda/);
+  } finally { cleanup(root); }
+});
+
+test('aborts only an unapproved initialization through a recoverable Git commit', () => {
+  const root = project();
+  try {
+    initProject(root);
+    const result = abortInitialization(root);
+    assert.ok(result.commit);
+    assert.equal(existsSync(resolve(root, '.mawa')), false);
+    assert.equal(existsSync(resolve(root, 'docs/mawa')), false);
+    assert.equal(existsSync(resolve(root, 'AGENTS.md')), false);
+    assert.match(execFileSync('git', ['log', '-1', '--format=%s'], { cwd: root, encoding: 'utf8' }), /mawa: abort initialization/);
+  } finally { cleanup(root); }
+});
+
+test('refuses to abort after the raw briefing has been approved', () => {
+  const root = project();
+  try {
+    initProject(root);
+    replaceRawBriefing(root, briefing());
+    approveCurrentGate(root);
+    assert.throws(() => abortInitialization(root), /só pode ser abortada/i);
+    assert.ok(existsSync(resolve(root, '.mawa/manifest.json')));
+  } finally { cleanup(root); }
+});
+
+test('refuses to remove an AGENTS.md changed after MAWA created it', () => {
+  const root = project();
+  try {
+    initProject(root);
+    writeFileSync(resolve(root, 'AGENTS.md'), '# Instruções alteradas\n');
+    assert.throws(() => abortInitialization(root), /AGENTS\.md changed/i);
+    assert.ok(existsSync(resolve(root, '.mawa/manifest.json')));
   } finally { cleanup(root); }
 });
 
