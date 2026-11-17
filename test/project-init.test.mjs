@@ -4,7 +4,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
-import { approveCurrentGate, auditProject, getContext, getNext, getStatus, initProject, replaceRawBriefing, validateCriticalBriefing, validateRawBriefing } from '../lib/project-core.mjs';
+import { approveCurrentGate, auditProject, getAgentHandoff, getContext, getNext, getStatus, initProject, replaceRawBriefing, validateCriticalBriefing, validateRawBriefing } from '../lib/project-core.mjs';
 import { createSetupPlan } from '../lib/stack-core.mjs';
 
 function project() {
@@ -139,6 +139,7 @@ test('initializes a documented, auditable project with a raw briefing', () => {
     assert.equal(result.state.currentStage, 'raw-briefing');
     assert.ok(existsSync(resolve(root, '.mawa/manifest.json')));
     assert.ok(existsSync(resolve(root, 'docs/mawa/intake/raw-briefing.md')));
+    assert.ok(existsSync(resolve(root, 'docs/mawa/handoffs/raw-briefing-agent.md')));
     assert.match(readFileSync(resolve(root, 'AGENTS.md'), 'utf8'), /mawa status/);
     assert.equal(getStatus(root).nextApproval, 'raw-briefing');
     assert.match(getNext(root).instructions.join('\n'), /Não crie uma especificação ainda/);
@@ -166,6 +167,11 @@ test('approves a reviewed raw briefing, writes evidence, and advances only to br
     assert.match(getContext(root).requiredReferences.join('\n'), /agent-contract/);
     assert.ok(existsSync(resolve(root, 'docs/mawa/interviews/critical-briefing.md')));
     assert.ok(existsSync(resolve(root, 'docs/mawa/analysis/project-brief.md')));
+    const handoff = getAgentHandoff(root);
+    assert.equal(handoff.path, 'docs/mawa/handoffs/briefing-agent.md');
+    assert.match(handoff.content, /uma pergunta bloqueante por vez/);
+    assert.match(handoff.content, /Não inicie discovery/);
+    assert.match(getContext(root).agentHandoff, /briefing-agent/);
   } finally { cleanup(root); }
 });
 
@@ -231,6 +237,8 @@ test('creates, freezes, and approves a setup plan before setup execution', () =>
     assert.match(getNext(root).instructions.join('\n'), /setup-plan/);
     const approval = approveCurrentGate(root, 'The setup plan was reviewed by a human.');
     assert.equal(approval.currentStage, 'setup-apply');
+    assert.ok(existsSync(resolve(root, 'docs/mawa/handoffs/setup-agent.md')));
+    assert.ok(existsSync(resolve(root, 'docs/mawa/handoffs/setup-apply-agent.md')));
     assert.equal(auditProject(root).length, 0);
     const manifest = JSON.parse(readFileSync(resolve(root, '.mawa/manifest.json'), 'utf8'));
     assert.equal(manifest.stack.id, 'nuxt-daredash');

@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { createInterface } from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
 import { basename, resolve } from 'node:path';
-import { approveCurrentGate, auditProject, getContext, getNext, getStatus, initProject, isGitRepository, MawaError, rawBriefingPath, replaceRawBriefing } from '../lib/project-core.mjs';
+import { approveCurrentGate, auditProject, getAgentHandoff, getContext, getNext, getStatus, initProject, isGitRepository, MawaError, rawBriefingPath, replaceRawBriefing } from '../lib/project-core.mjs';
 import { createSetupPlan, doctorProject, listStackTemplates } from '../lib/stack-core.mjs';
 import { validateLegacy } from '../lib/legacy-validator.mjs';
 
@@ -21,7 +21,7 @@ function parse(argv) {
 }
 
 function usage() {
-  console.log(`MAWA\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa context [--json]\n  mawa approve [--comment TEXT]\n  mawa doctor [--stack ID] [--app-root PATH]\n  mawa setup [--stack ID] [--app-root PATH] [--template-language pug|html]\n  mawa stack list\n  mawa audit\n\nLegacy compatibility:\n  mawa validate [project-directory]\n`);
+  console.log(`MAWA\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa context [--json]\n  mawa handoff\n  mawa approve [--comment TEXT]\n  mawa doctor [--stack ID] [--app-root PATH]\n  mawa setup [--stack ID] [--app-root PATH] [--template-language pug|html]\n  mawa stack list\n  mawa audit\n\nLegacy compatibility:\n  mawa validate [project-directory]\n`);
 }
 
 function askInterface() { return createInterface({ input: stdin, output: stdout }); }
@@ -115,7 +115,8 @@ async function approveCommand(options) {
   const root = resolve(options.root || '.');
   if (isInteractive(options) && !await confirm('Você revisou o artefato atual e confirma esta aprovação?', false)) return console.log('Aprovação cancelada. Nenhum estado foi alterado.');
   const result = approveCurrentGate(root, options.comment || null);
-  console.log(`Aprovação registrada. Etapa atual: ${result.currentStage}\nDecisão: ${result.decision}`);
+  const handoff = getAgentHandoff(root);
+  console.log(`Aprovação registrada. Etapa atual: ${result.currentStage}\nDecisão: ${result.decision}\n\nPróxima ação para o agente:\nLeia ${handoff.path} ou execute “mawa handoff” para exibir o handoff completo.`);
 }
 
 async function setupCommand(options) {
@@ -157,6 +158,12 @@ export async function runCli(argv = process.argv.slice(2)) {
     return;
   }
   if (command === 'context') return console.log(JSON.stringify(getContext(root), null, 2));
+  if (command === 'handoff') {
+    const handoff = getAgentHandoff(root);
+    if (options.json) return console.log(JSON.stringify(handoff, null, 2));
+    console.log(`\nMAWA — handoff para o agente\n\nArquivo: ${handoff.path}\n\n${handoff.content}`);
+    return;
+  }
   if (command === 'approve') return approveCommand(options);
   if (command === 'setup') return setupCommand(options);
   if (command === 'stack' && positionals[1] === 'list') {

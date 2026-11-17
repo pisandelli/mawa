@@ -30,6 +30,11 @@ and `.mawa/` for operational state, then asks how you want to provide the Raw Br
 Run `mawa next` whenever you need the next required action. The default experience is
 interactive; automation flags will remain optional.
 
+At every supported stage transition, MAWA also writes an agent handoff in
+`docs/mawa/handoffs/`. Run `mawa handoff` to display the active handoff for Codex or
+another agent; it specifies only the required context, permitted actions, and the next
+human gate.
+
 MAWA is an AI-native operating workflow for governed discovery, architecture, specification, implementation, and validation. Its new CLI core is framework-agnostic; stack-specific behavior will be supplied by versioned templates.
 
 Nuxt 4 remains the first certified template and the legacy v1 reference below is Nuxt-focused.
