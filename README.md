@@ -40,6 +40,7 @@ Useful commands:
 ```bash
 mawa status
 mawa next
+mawa briefing
 mawa handoff
 mawa approve
 mawa doctor

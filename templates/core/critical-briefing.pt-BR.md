@@ -17,12 +17,15 @@
 
 ## Questões e decisões
 
+Registre uma questão bloqueante por vez. Uma resposta não confirmada deve permanecer
+como hipótese, risco ou pendência — nunca como fato no Project Brief.
+
 ### Q-001
 
 - Classificação: blocking
 - Pergunta: [Registre a pergunta mais importante ainda não respondida.]
 - Resposta: [Registre a resposta humana.]
-- Challenge: [Registre como a resposta foi testada, contestada ou esclarecida.]
+- Contraponto: [Registre como a resposta foi testada, contestada ou esclarecida.]
 - Decisão: [Registre a decisão, hipótese ou adiamento responsável.]
 - Estado: open
 

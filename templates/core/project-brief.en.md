@@ -1,5 +1,8 @@
 # Project Brief
 
+This document consolidates only facts, decisions, and deferrals recorded in the
+critical interview. Do not use it to fill gaps by inference.
+
 ## Project name
 
 [Product or initiative name.]

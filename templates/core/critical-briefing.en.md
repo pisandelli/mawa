@@ -17,6 +17,9 @@
 
 ## Questions and decisions
 
+Record one blocking question at a time. An unconfirmed answer must remain an
+assumption, risk, or open item — never a fact in the Project Brief.
+
 ### Q-001
 
 - Classification: blocking

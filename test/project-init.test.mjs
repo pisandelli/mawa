@@ -4,7 +4,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
-import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getContext, getNext, getStatus, initProject, replaceRawBriefing, validateCriticalBriefing, validateRawBriefing } from '../lib/project-core.mjs';
+import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getBriefingProgress, getContext, getNext, getStatus, initProject, replaceRawBriefing, validateCriticalBriefing, validateRawBriefing } from '../lib/project-core.mjs';
 import { createSetupPlan } from '../lib/stack-core.mjs';
 
 function project() {
@@ -61,7 +61,7 @@ function criticalInterview() {
 - Classificação: blocking
 - Pergunta: Quem pode visualizar pedidos que contêm informações internas de outra área?
 - Resposta: Apenas analistas autorizados e líderes da área responsável podem ver o pedido completo.
-- Challenge: Confirmamos que solicitantes de outras áreas não devem acessar anexos ou comentários internos.
+- Contraponto: Confirmamos que solicitantes de outras áreas não devem acessar anexos ou comentários internos.
 - Decisão: O piloto terá visibilidade restrita por área e a política detalhada será refinada no discovery.
 - Estado: resolved
 
@@ -206,6 +206,10 @@ test('approves a reviewed raw briefing, writes evidence, and advances only to br
     assert.match(handoff.content, /uma pergunta bloqueante por vez/);
     assert.match(handoff.content, /Não inicie discovery/);
     assert.match(getContext(root).agentHandoff, /briefing-agent/);
+    const progress = getBriefingProgress(root);
+    assert.equal(progress.coverage.filter((item) => item.complete).length, 0);
+    assert.deepEqual(progress.openBlockingQuestions, ['Q-001']);
+    assert.equal(progress.readyForApproval, false);
   } finally { cleanup(root); }
 });
 
@@ -230,6 +234,10 @@ test('approves a complete critical interview and project brief before setup', ()
     approveCurrentGate(root);
     writeFileSync(resolve(root, 'docs/mawa/interviews/critical-briefing.md'), criticalInterview());
     writeFileSync(resolve(root, 'docs/mawa/analysis/project-brief.md'), projectBrief());
+    const progress = getBriefingProgress(root);
+    assert.equal(progress.coverage.filter((item) => item.complete).length, 10);
+    assert.deepEqual(progress.openBlockingQuestions, []);
+    assert.equal(progress.readyForApproval, true);
     const result = approveCurrentGate(root, 'The critical interview was reviewed by a human.');
     assert.equal(result.currentStage, 'setup');
     assert.equal(getStatus(root).nextApproval, null);

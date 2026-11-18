@@ -6,7 +6,7 @@ import { stdin, stdout } from 'node:process';
 import { basename, resolve } from 'node:path';
 import { parseArgs } from 'citty';
 import { cancel, confirm as clackConfirm, intro, isCancel, log, outro, select, spinner, text } from '@clack/prompts';
-import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getContext, getNext, getStatus, initProject, isGitRepository, MawaError, rawBriefingPath, replaceRawBriefing, validateRawBriefing } from '../lib/project-core.mjs';
+import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getBriefingProgress, getContext, getNext, getStatus, initProject, isGitRepository, MawaError, rawBriefingPath, replaceRawBriefing, validateRawBriefing } from '../lib/project-core.mjs';
 import { createSetupPlan, doctorProject, listStackTemplates } from '../lib/stack-core.mjs';
 
 function parse(argv) {
@@ -20,7 +20,7 @@ function parse(argv) {
 }
 
 function usage() {
-  console.log(`MAWA — MAWA Advances Work Accountably\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa context [--json]\n  mawa handoff [--start-codex]\n  mawa approve [--comment TEXT] [--start-codex]\n  mawa abort\n  mawa doctor [--stack ID] [--app-root PATH]\n  mawa setup [--stack ID] [--app-root PATH] [--template-language pug|html]\n  mawa stack list\n  mawa audit\n\nUse --json for machine-readable output.\n`);
+  console.log(`MAWA — MAWA Advances Work Accountably\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa briefing\n  mawa context [--json]\n  mawa handoff [--start-codex]\n  mawa approve [--comment TEXT] [--start-codex]\n  mawa abort\n  mawa doctor [--stack ID] [--app-root PATH]\n  mawa setup [--stack ID] [--app-root PATH] [--template-language pug|html]\n  mawa stack list\n  mawa audit\n\nUse --json for machine-readable output.\n`);
 }
 
 function askInterface() { return createInterface({ input: stdin, output: stdout }); }
@@ -153,7 +153,7 @@ async function rawBriefingMenu(root, options) {
       log.success(`Etapa atual: ${result.currentStage}`);
       log.info(`Handoff do agente: ${handoff.path}`);
       await offerCodex(root, handoff, options);
-      return outro('A entrevista crítica está pronta para ser conduzida pelo agente.');
+      return briefingMenu(root, options);
     }
     if (!await confirm('Abortar a inicialização? O MAWA registrará uma reversão recuperável no Git.', false)) continue;
     const task = spinner();
@@ -177,6 +177,66 @@ async function offerCodex(root, handoff, options) {
   if (result.error || result.status !== 0) log.warn('A sessão do Codex foi encerrada sem concluir normalmente. O handoff permanece salvo no projeto.');
 }
 
+function showBriefingProgress(root) {
+  const progress = getBriefingProgress(root);
+  const complete = progress.coverage.filter((item) => item.complete).length;
+  log.info(`Cobertura: ${complete}/${progress.coverage.length} temas completos.`);
+  for (const item of progress.coverage) {
+    const mark = item.complete ? '✓' : '○';
+    log.message(`${mark} ${item.topic}: ${item.status}`);
+  }
+  if (progress.openBlockingQuestions.length) log.warn(`Questão bloqueante aberta: ${progress.openBlockingQuestions.join(', ')}.`);
+  if (progress.approvalErrors.length) {
+    log.warn('Ainda não é possível aprovar o briefing:');
+    progress.approvalErrors.forEach((error) => log.message(`• ${error}`));
+  } else log.success('Os documentos atendem aos critérios de aprovação. Revise-os antes de confirmar.');
+  return progress;
+}
+
+async function briefingMenu(root, options) {
+  while (true) {
+    const action = await choose('Entrevista crítica. O que deseja fazer agora?', [
+      { label: 'Continuar entrevista com Codex', value: 'resume', hint: 'o agente faz a próxima pergunta bloqueante' },
+      { label: 'Ver cobertura e critérios de aprovação', value: 'progress', hint: 'mostra pendências sem avançar' },
+      { label: 'Aprovar briefing e seguir para setup', value: 'approve', hint: 'exige documentação completa e revisão humana' },
+      { label: 'Editar documentos ou retomar depois', value: 'edit', hint: 'preserva a etapa atual sem aprovar' },
+    ]);
+    if (action === 'edit') return outro('Os documentos permanecem em docs/mawa/. Execute “mawa next” para retomar esta entrevista.');
+    if (action === 'progress') {
+      showBriefingProgress(root);
+      continue;
+    }
+    if (action === 'resume') {
+      const handoff = getAgentHandoff(root);
+      await offerCodex(root, handoff, options);
+      continue;
+    }
+    const progress = showBriefingProgress(root);
+    if (!progress.readyForApproval) continue;
+    if (!await confirm('Você revisou a entrevista e o Project Brief e confirma esta aprovação?', false)) continue;
+    const task = spinner();
+    task.start('Registrando aprovação auditável do briefing');
+    const result = approveCurrentGate(root, options.comment || null);
+    task.stop('Briefing aprovado');
+    const handoff = getAgentHandoff(root);
+    log.success(`Etapa atual: ${result.currentStage}`);
+    log.info(`Handoff do agente: ${handoff.path}`);
+    await offerCodex(root, handoff, options);
+    return outro('O briefing foi aprovado. O próximo gate é o plano de setup.');
+  }
+}
+
+async function briefingCommand(options) {
+  const root = resolve(options.root || '.');
+  if (getStatus(root).currentStage !== 'briefing') throw new MawaError('A entrevista crítica só está disponível na etapa briefing.', 'WRONG_STAGE');
+  if (isInteractive(options)) {
+    intro('MAWA — entrevista crítica');
+    return briefingMenu(root, options);
+  }
+  const progress = getBriefingProgress(root);
+  console.log(JSON.stringify(progress, null, 2));
+}
+
 async function approveCommand(options) {
   const root = resolve(options.root || '.');
   if (isInteractive(options) && !await confirm('Você revisou o artefato atual e confirma esta aprovação?', false)) return cancel('Aprovação cancelada. Nenhum estado foi alterado.');
@@ -189,6 +249,7 @@ async function approveCommand(options) {
     log.success(`Etapa atual: ${result.currentStage}`);
     log.info(`Handoff do agente: ${handoff.path}`);
     await offerCodex(root, handoff, options);
+    if (result.currentStage === 'briefing') return briefingMenu(root, options);
     return;
   }
   console.log(`Aprovação registrada. Etapa atual: ${result.currentStage}\nDecisão: ${result.decision}\n\nPróxima ação para o agente:\nLeia ${handoff.path} ou execute “mawa handoff” para exibir o handoff completo.`);
@@ -252,10 +313,12 @@ export async function runCli(argv = process.argv.slice(2)) {
     return;
   }
   if (command === 'next') {
+    if (isInteractive(options) && getStatus(root).currentStage === 'briefing') return briefingCommand(options);
     const next = getNext(root);
     console.log(`\nMAWA — próximo passo\n\nEtapa: ${next.stage}\n${next.artifact ? `Artefato: ${next.artifact}\n` : ''}\n${next.instructions.map((item, index) => `${index + 1}. ${item}`).join('\n')}`);
     return;
   }
+  if (command === 'briefing') return briefingCommand(options);
   if (command === 'context') return console.log(JSON.stringify(getContext(root), null, 2));
   if (command === 'handoff') {
     const handoff = getAgentHandoff(root);

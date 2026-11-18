@@ -1,5 +1,8 @@
 # Project Brief
 
+Este documento consolida somente fatos, decisões e adiamentos registrados na entrevista
+crítica. Não use-o para preencher lacunas por inferência.
+
 ## Nome do projeto
 
 [Nome do produto ou iniciativa.]
