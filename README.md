@@ -1,318 +1,74 @@
 # MAWA
-### Governed workflow for accountable AI-assisted delivery
 
-> **CLI foundation in progress.** The first executable MAWA increment adds an
-> auditable project bootstrap and critical briefing: `mawa init`, `mawa status`,
-> `mawa next`, `mawa context`, Raw Briefing capture, a guided interview ledger,
-> approval, and audit. The workflow below is
-> the v1 behavioral reference while the remaining stages become runtime-enforced.
+**MAWA Advances Work Accountably.**
 
-The first certified stack contract is `nuxt-daredash`. It contains declared recipes,
-patch safety rules, validations, UI-library instruction precedence, and test fixtures.
-At the setup stage, `mawa doctor` inspects the project without changing it. Applying a
-setup plan remains a later, explicitly approved increment.
+MAWA is an auditable CLI for guiding AI-assisted software delivery through explicit
+human gates. It keeps human-readable project documentation in `docs/mawa/` and
+operational state, evidence, decisions, and snapshots in `.mawa/`.
 
-`mawa setup` is the guided path: it records the app directory, template language, UI
-options, diagnostic, and frozen stack/profile snapshot in a human-readable setup plan.
-It changes no application code or dependencies; `mawa approve` records the human plan
-approval before a future execution stage can begin.
+This repository contains the v2 engine. It is deliberately independent of earlier
+MAWA implementations.
 
-## Start a governed project
+## Current scope
 
-From a Git repository with `user.name` and `user.email` configured:
+The current beta supports:
+
+- guided project initialization and Raw Briefing capture;
+- Raw Briefing validation and approval;
+- a critical-interview ledger and Project Brief templates;
+- auditable Git decisions and evidence hashes;
+- agent handoffs with an optional local Codex CLI launch;
+- certified-stack inspection and setup planning for Nuxt + DareDash;
+- a recoverable abort before the first workflow approval.
+
+The CLI blocks transitions for stages that are not implemented yet. It does not claim
+to execute setup recipes, generate layouts, or implement application modules.
+
+## Use it locally
 
 ```bash
-mawa init
+pnpm install
+pnpm run mawa -- init .
 ```
 
-MAWA guides the initial choices, creates `docs/mawa/` for human-readable artifacts
-and `.mawa/` for operational state, then asks how you want to provide the Raw Briefing.
-Run `mawa next` whenever you need the next required action. The default experience is
-interactive; automation flags will remain optional.
+Run the command from the target project's Git repository. The interactive flow asks
+how to provide the Raw Briefing, validates it before approval, and records each
+approved decision in Git.
 
-At every supported stage transition, MAWA also writes an agent handoff in
-`docs/mawa/handoffs/`. Run `mawa handoff` to display the active handoff for Codex or
-another agent; it specifies only the required context, permitted actions, and the next
-human gate.
+Useful commands:
 
-In an interactive terminal, MAWA uses guided prompts and offers to start a local Codex
-session with the active handoff after approval. This is always opt-in and preserves the
-Codex session's normal approval and sandbox controls. Use `mawa handoff --start-codex`
-to start it explicitly.
+```bash
+mawa status
+mawa next
+mawa handoff
+mawa approve
+mawa doctor
+mawa setup
+mawa audit
+```
 
-MAWA is an AI-native operating workflow for governed discovery, architecture, specification, implementation, and validation. Its new CLI core is framework-agnostic; stack-specific behavior will be supplied by versioned templates.
-
-Nuxt 4 remains the first certified template and the legacy v1 reference below is Nuxt-focused.
-
-**Entry point:** any AI agent (Claude, Codex, Cursor, …) should read [`AGENTS.md`](AGENTS.md) first. It is the tool-neutral boot and orchestration guide. `CLAUDE.md` only points there.
-
-MAWA remains adapter-based for:
-
-- UI libraries;
-- design tools;
-- design-to-implementation handoff rules.
-
-Default stack:
-
-- Nuxt 4
-- pnpm
-- Pinia
-- TypeScript strict
-- DareDash UI adapter
-- Pencil design adapter
-- interactive mode
-
-Pre-configured baseline modules (installed and wired into `nuxt.config.ts` in every project):
-
-- `@nuxt/eslint` + `eslint` (flat config via `eslint.config.mjs`)
-- `@vueuse/nuxt`
-- `@pinia/nuxt`
-
----
-
-## Status — Beta (`0.1.0-beta.3`)
-
-MAWA is in **public beta**. The stage flow is validated end-to-end and the core is
-internally consistent, but expect rough edges and breaking changes between betas.
-
-Known limitations (read before adopting):
-
-- **Adapters are not all real yet.** Only **DareDash** (UI) and **Pencil** (design) are
-  implemented. Nuxt UI, Ant Design Vue, PrimeVue, Penpot, Figma, and Google Stitch are
-  planned placeholders, not production-ready.
-- **The default UI stack is itself pre-1.0.** `@pisandelli/daredash` ships as a beta
-  package; its component API and `llms.txt` may change.
-- **Runtime enforcement is incremental.** The CLI currently enforces initialization,
-  Raw Briefing, and critical Project Brief gates; the remaining v1 stages are being
-  migrated in sequence.
-- **The full design path is unproven.** The optional `05a` design handoff (with a live
-  design-tool MCP such as Pencil) has not been exercised end-to-end; the skip path has.
-
-What *is* validated: the boot → 00–08 flow, state resume, stage-ID resolution, the
-DoD gates, the source-URL adapter docs, and a generated module that type-checks and
-unit-tests clean against real Nuxt 4 + `@pisandelli/daredash`.
-
----
-
-## Seed Artifact
-
-MAWA starts from a **Raw Briefing**.
-
-The Raw Briefing is the seed artifact that generates the rest of the project documentation.
+## Repository layout
 
 ```text
-inputs/raw-briefing.md
+bin/                CLI entry point
+lib/                state machine, audit, stack inspection
+schemas/            validated data contracts
+templates/core/     generated project documentation contracts
+templates/stacks/   certified, versioned stack contracts
+profiles/           corporate command and runtime policies
+test/               executable behavior specification
 ```
 
-The Raw Briefing may be incomplete, informal, subjective, or messy. MAWA turns it into a structured Project Briefing before Discovery begins.
+## Development
 
----
-
-## Core Workflow
-
-```text
-Raw Briefing
-  ↓
-Project Briefing
-  ↓
-Discovery Spec
-  ↓
-Domain Map
-  ↓
-Module Specs
-  ↓
-Environment Setup (just-in-time)
-  ↓
-Design Handoff (optional)
-  ↓
-Implementation
-  ↓
-Review
+```bash
+npm test
 ```
 
-Stage protocols:
+The test suite creates temporary Git repositories to verify approvals, evidence,
+rollback behavior, and stack planning.
 
-```text
-00-project-init.md
-01-project-briefing-prompt.md
-03-discovery-prompt.md
-04-domain-architecture-prompt.md
-05-module-spec-prompt.md
-02-environment-setup-prompt.md
-05a-design-handoff-prompt.md
-06-implementation-prompt.md
-06a-implementation-from-approved-layout-prompt.md
-07-review-validation-prompt.md
-```
+## Distribution status
 
-These files are stage protocols, not manual copy/paste steps.
-
-In normal use, MAWA may proceed from one stage to the next after human approval, depending on `interaction_mode`.
-
-For new applications, environment setup is deferred until the selected workflow mode has
-enough approved specifications: after the first spec in `module-by-module`, or after all
-planned specs in `phase-by-phase`. Existing applications are only inventoried read-only
-during initialization until that same setup gate is reached.
-
----
-
-## Official Artifacts
-
-```text
-inputs/
-  raw-briefing.md
-
-specs/
-  briefing/
-    project-briefing.md
-  discovery/
-    discovery.spec.md
-  domain/
-    domain-map.md
-  modules/
-    [module-name].spec.md
-  layouts/
-    [module-name].approved-layout.md
-  reviews/
-    [module-name].review.md
-```
-
----
-
-## Repository Structure
-
-```text
-mawa/
-├── README.md
-├── AGENTS.md
-├── CLAUDE.md
-├── inputs/
-├── prompts/
-├── governance/
-├── workflow/
-├── adapters/
-│   ├── ui/
-│   └── design/
-├── dna/
-│   ├── nuxt4/
-│   └── nuxt4-daredash/
-├── resources/
-├── quickstart/
-└── specs/
-```
-
----
-
-## Application Location
-
-The Nuxt application is kept separate from the workflow files. Its directory is set in
-`.mawa-config.yaml` as `paths.app_root` (default `./web`, asked during Stage 00). All setup
-and implementation happen inside it; MAWA's workflow files and `specs/` stay at the root.
-Use `.` to build the app at the repo root. Avoid `./app` — it collides with Nuxt 4's
-`app/` srcDir.
-
-## Setup Policy
-
-MAWA never installs or modifies setup silently or beyond the fixed baseline. Two tiers
-(full detail in `workflow/setup-policy.md`):
-
-- **Fixed baseline — auto-applied, always reported.** In `ide` mode MAWA installs and
-  configures the baseline (Nuxt scaffold, `@pinia/nuxt`, `@nuxt/eslint` + `eslint`,
-  `@vueuse/nuxt`, and when `template_language` is `pug`: `pug`, `@types/pug`,
-  `@vue/language-plugin-pug`, plus the corresponding `nuxt.config.ts` Vue compiler
-  plugin setup) without asking, then clearly reports the commands run, packages added,
-  and files changed.
-- **Everything else — confirm-first.** UI adapter packages, the optional test toolchain,
-  design tooling, and any choice-bearing dependency: MAWA provides commands and snippets,
-  the human confirms, and MAWA applies them automatically only on explicit request.
-
----
-
-## UI Adapters
-
-Default:
-
-- DareDash
-
-Planned placeholders (not production-ready):
-
-- Nuxt UI
-- Ant Vue
-- PrimeVue
-
-DareDash uses external operational docs loaded from the configured source URL when a stage requires UI-specific decisions. The docs are session-scoped; if they are not available in the current session, MAWA must load them again or ask the human to provide them in web mode. A committed local copy is not required.
-
-Source URL:
-
-```text
-https://raw.githubusercontent.com/pisandelli/daredash/main/llms.txt
-```
-
----
-
-## Design Adapters
-
-Default:
-
-- Pencil
-
-Planned placeholders (not production-ready):
-
-- Penpot
-- Figma
-- Google Stitch
-
-Design MCP/tooling is configured outside MAWA.
-
-MAWA assumes the selected design tool is already available in the execution environment.
-
----
-
-## Interaction Modes
-
-Default:
-
-```text
-interactive
-```
-
-Interactive mode asks before advancing stages and before implementation.
-It does not require the human to copy/paste the next prompt.
-
-Continuous mode proceeds when safe assumptions exist and stops only for real blockers.
-
----
-
-## Quickstart
-
-`quickstart/` is secondary. Use it only for prototypes, small MVPs, or experiments where the full MAWA stage flow is unnecessary. The main workflow is the numbered protocol flow in `prompts/`.
-
----
-
-## DNA
-
-DNA files are canonical implementation references.
-
-```text
-dna/nuxt4/
-  Base Nuxt 4 architecture examples.
-
-dna/nuxt4-daredash/
-  Nuxt 4 + DareDash UI examples.
-```
-
----
-
-## Philosophy
-
-MAWA moves AI-assisted development from:
-
-```text
-Generate code from a prompt.
-```
-
-to:
-
-```text
-Execute a governed Nuxt 4 engineering workflow.
-```
+MAWA is not published yet. The package remains private while the CLI contract and
+the remaining workflow stages are built and tested.

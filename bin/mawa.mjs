@@ -8,9 +8,6 @@ import { parseArgs } from 'citty';
 import { cancel, confirm as clackConfirm, intro, isCancel, log, outro, select, spinner, text } from '@clack/prompts';
 import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getContext, getNext, getStatus, initProject, isGitRepository, MawaError, rawBriefingPath, replaceRawBriefing, validateRawBriefing } from '../lib/project-core.mjs';
 import { createSetupPlan, doctorProject, listStackTemplates } from '../lib/stack-core.mjs';
-import { validateLegacy } from '../lib/legacy-validator.mjs';
-
-export const validate = validateLegacy;
 
 function parse(argv) {
   const options = parseArgs(argv, {
@@ -23,7 +20,7 @@ function parse(argv) {
 }
 
 function usage() {
-  console.log(`MAWA — MAWA Advances Work Accountably\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa context [--json]\n  mawa handoff [--start-codex]\n  mawa approve [--comment TEXT] [--start-codex]\n  mawa abort\n  mawa doctor [--stack ID] [--app-root PATH]\n  mawa setup [--stack ID] [--app-root PATH] [--template-language pug|html]\n  mawa stack list\n  mawa audit\n\nUse --json for machine-readable output.\n\nLegacy compatibility:\n  mawa validate [project-directory]\n`);
+  console.log(`MAWA — MAWA Advances Work Accountably\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa context [--json]\n  mawa handoff [--start-codex]\n  mawa approve [--comment TEXT] [--start-codex]\n  mawa abort\n  mawa doctor [--stack ID] [--app-root PATH]\n  mawa setup [--stack ID] [--app-root PATH] [--template-language pug|html]\n  mawa stack list\n  mawa audit\n\nUse --json for machine-readable output.\n`);
 }
 
 function askInterface() { return createInterface({ input: stdin, output: stdout }); }
@@ -286,12 +283,6 @@ export async function runCli(argv = process.argv.slice(2)) {
     const issues = auditProject(root);
     if (issues.length) { issues.forEach((issue) => console.error(`error: ${issue}`)); process.exitCode = 1; }
     else console.log('MAWA audit passed.');
-    return;
-  }
-  if (command === 'validate') {
-    const errors = validateLegacy(resolve(process.cwd(), positionals[1] || '.'));
-    if (errors.length) { errors.forEach((issue) => console.error(`error: ${issue}`)); process.exitCode = 1; }
-    else console.log('Legacy MAWA fixture is valid.');
     return;
   }
   throw new MawaError('Comando desconhecido. Execute mawa help.', 'UNKNOWN_COMMAND');

@@ -1,23 +1,21 @@
-name: Validate MAWA
+name: Verify MAWA v2
 
 on:
   pull_request:
   push:
-    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
-  validate:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm test
-      - run: npm run validate -- fixtures/valid-project
-      - name: Reject an invalid fixture
-        run: '! npm run validate -- fixtures/invalid-missing-manifest'
-      - name: Reject incomplete implementation readiness
-        run: '! npm run validate -- fixtures/invalid-readiness'
-      - name: Reject setup at the wrong flow gate
-        run: '! npm run validate -- fixtures/invalid-setup-context'
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: npm pack --dry-run
