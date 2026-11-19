@@ -1,7 +1,7 @@
 {
   "id": "nuxt-config-baseline",
   "target": "nuxt.config.ts",
-  "strategy": "ast-merge-required",
+  "strategy": "conservative-structural-append",
   "neverOverwrite": true,
   "requiresHumanReview": true,
   "modules": ["@nuxt/eslint", "@vueuse/nuxt", "@pinia/nuxt", "@pisandelli/daredash"],
@@ -12,5 +12,5 @@
     "daredash.debug": false
   },
   "conflicts": ["unparseable-config", "dynamic-modules-expression", "duplicate-module-with-incompatible-options"],
-  "recovery": "Generate a unified patch only. If the configuration cannot be merged safely, block execution and show the conflict."
+  "recovery": "Generate an append-only proposal only. If the configuration already partially defines baseline options or cannot be parsed safely, block execution and show the conflict."
 }

@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getBriefingProgress, getContext, getNext, getStatus, initProject, replaceRawBriefing, validateCriticalBriefing, validateRawBriefing } from '../lib/project-core.mjs';
-import { createSetupPlan } from '../lib/stack-core.mjs';
+import { createNuxtConfigPatchProposal, createSetupPlan } from '../lib/stack-core.mjs';
 
 function project() {
   const root = mkdtempSync(resolve(tmpdir(), 'mawa-init-'));
@@ -301,6 +301,31 @@ test('blocks a setup plan whose Nuxt configuration cannot be safely patched', ()
     createSetupPlan(root, { appRoot: '.' });
     assert.throws(() => approveCurrentGate(root), /configuration conflict/);
     assert.equal(getStatus(root).currentStage, 'setup');
+  } finally { cleanup(root); }
+});
+
+test('records a minimal Nuxt configuration patch proposal without changing the app', () => {
+  const root = project();
+  try {
+    initProject(root);
+    replaceRawBriefing(root, briefing());
+    approveCurrentGate(root);
+    writeFileSync(resolve(root, 'docs/mawa/interviews/critical-briefing.md'), criticalInterview());
+    writeFileSync(resolve(root, 'docs/mawa/analysis/project-brief.md'), projectBrief());
+    approveCurrentGate(root);
+    mkdirSync(resolve(root, 'web'), { recursive: true });
+    writeFileSync(resolve(root, 'web/package.json'), JSON.stringify({ dependencies: { nuxt: '4.6.4' } }));
+    const config = "export default defineNuxtConfig({\n  compatibilityDate: '2026-01-01',\n})\n";
+    writeFileSync(resolve(root, 'web/nuxt.config.ts'), config);
+    createSetupPlan(root, { appRoot: 'web' });
+    approveCurrentGate(root);
+    const result = createNuxtConfigPatchProposal(root);
+    assert.equal(result.status, 'proposed');
+    assert.equal(readFileSync(resolve(root, 'web/nuxt.config.ts'), 'utf8'), config);
+    assert.match(readFileSync(resolve(root, result.proposal), 'utf8'), /@pinia\/nuxt/);
+    const evidence = JSON.parse(readFileSync(resolve(root, result.evidence), 'utf8'));
+    assert.ok(evidence.sourceSha256);
+    assert.ok(evidence.proposedSha256);
   } finally { cleanup(root); }
 });
 

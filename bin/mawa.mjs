@@ -7,7 +7,7 @@ import { basename, resolve } from 'node:path';
 import { parseArgs } from 'citty';
 import { cancel, confirm as clackConfirm, intro, isCancel, log, outro, select, spinner, text } from '@clack/prompts';
 import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getBriefingProgress, getContext, getNext, getStatus, initProject, isGitRepository, MawaError, rawBriefingPath, replaceRawBriefing, validateRawBriefing } from '../lib/project-core.mjs';
-import { createSetupPlan, doctorProject, listStackTemplates } from '../lib/stack-core.mjs';
+import { createNuxtConfigPatchProposal, createSetupPlan, doctorProject, listStackTemplates } from '../lib/stack-core.mjs';
 
 function parse(argv) {
   const options = parseArgs(argv, {
@@ -20,7 +20,7 @@ function parse(argv) {
 }
 
 function usage() {
-  console.log(`MAWA — MAWA Advances Work Accountably\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa briefing\n  mawa context [--json]\n  mawa handoff [--start-codex]\n  mawa approve [--comment TEXT] [--start-codex]\n  mawa abort\n  mawa doctor [--stack ID] [--app-root PATH]\n  mawa setup [--stack ID] [--app-root PATH] [--template-language pug|html]\n  mawa stack list\n  mawa audit\n\nUse --json for machine-readable output.\n`);
+  console.log(`MAWA — MAWA Advances Work Accountably\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa briefing\n  mawa context [--json]\n  mawa handoff [--start-codex]\n  mawa approve [--comment TEXT] [--start-codex]\n  mawa abort\n  mawa doctor [--stack ID] [--app-root PATH]\n  mawa setup [--stack ID] [--app-root PATH] [--template-language pug|html]\n  mawa setup patch\n  mawa stack list\n  mawa audit\n\nUse --json for machine-readable output.\n`);
 }
 
 function askInterface() { return createInterface({ input: stdin, output: stdout }); }
@@ -299,6 +299,20 @@ async function setupCommand(options) {
   console.log(`\nPlano de setup criado.\n\nDiagnóstico: ${result.doctor}\nPlano: ${result.plan}\n\nRevise as versões, as receitas, a origem do DareDash e a política de patch. Execute “mawa approve” somente quando aprovar o plano.`);
 }
 
+async function setupPatchCommand(options) {
+  const root = resolve(options.root || '.');
+  if (isInteractive(options)) {
+    intro('MAWA — proposta de patch Nuxt');
+    if (!await confirm('Gerar uma proposta de patch sem modificar a aplicação?', true)) return cancel('Proposta cancelada. Nenhum arquivo foi alterado.');
+  }
+  const task = isInteractive(options) ? spinner() : null;
+  task?.start('Analisando nuxt.config.ts e registrando a proposta');
+  const result = createNuxtConfigPatchProposal(root);
+  task?.stop('Proposta de patch registrada');
+  if (isInteractive(options)) return outro(`Status: ${result.status}\nProposta: ${result.proposal}`);
+  console.log(JSON.stringify(result, null, 2));
+}
+
 export async function runCli(argv = process.argv.slice(2)) {
   const { positionals, options } = parse(argv);
   const command = positionals[0];
@@ -329,6 +343,7 @@ export async function runCli(argv = process.argv.slice(2)) {
   }
   if (command === 'approve') return approveCommand(options);
   if (command === 'abort') return abortCommand(options);
+  if (command === 'setup' && positionals[1] === 'patch') return setupPatchCommand(options);
   if (command === 'setup') return setupCommand(options);
   if (command === 'stack' && positionals[1] === 'list') {
     const stacks = listStackTemplates();

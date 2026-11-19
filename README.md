@@ -45,6 +45,7 @@ mawa handoff
 mawa approve
 mawa doctor
 mawa setup
+mawa setup patch
 mawa audit
 ```
 
