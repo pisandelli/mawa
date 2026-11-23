@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getBriefingProgress, getContext, getNext, getStatus, initProject, replaceRawBriefing, validateCriticalBriefing, validateRawBriefing } from '../lib/project-core.mjs';
-import { applyNuxtConfigPatch, createNuxtConfigPatchProposal, createSetupPlan, executeSetupScaffold } from '../lib/stack-core.mjs';
+import { applyNuxtConfigPatch, createNuxtConfigPatchProposal, createSetupPlan, executeSetupDependencies, executeSetupScaffold } from '../lib/stack-core.mjs';
 
 function project() {
   const root = mkdtempSync(resolve(tmpdir(), 'mawa-init-'));
@@ -330,6 +330,18 @@ test('records a minimal Nuxt configuration patch proposal without changing the a
     assert.equal(applied.status, 'proposed');
     assert.match(readFileSync(resolve(root, 'web/nuxt.config.ts'), 'utf8'), /daredash: \{ prefix: 'dd', debug: false \}/);
     assert.ok(existsSync(resolve(root, applied.evidence)));
+    const dependencyCommands = [];
+    const dependencies = executeSetupDependencies(root, {
+      confirmed: true,
+      runner: (executable, argumentsList, runOptions) => {
+        dependencyCommands.push({ executable, argumentsList, cwd: runOptions.cwd });
+        return { status: 0, stdout: 'installed', stderr: '' };
+      },
+    });
+    assert.equal(dependencies.commands, 4);
+    assert.equal(dependencyCommands.length, 4);
+    assert.ok(dependencyCommands.every((command) => command.executable === 'pnpm' && command.cwd === resolve(root, 'web')));
+    assert.ok(existsSync(resolve(root, dependencies.evidence)));
   } finally { cleanup(root); }
 });
 

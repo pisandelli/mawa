@@ -7,7 +7,7 @@ import { basename, resolve } from 'node:path';
 import { parseArgs } from 'citty';
 import { cancel, confirm as clackConfirm, intro, isCancel, log, outro, select, spinner, text } from '@clack/prompts';
 import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getBriefingProgress, getContext, getNext, getStatus, initProject, isGitRepository, MawaError, rawBriefingPath, replaceRawBriefing, validateRawBriefing } from '../lib/project-core.mjs';
-import { applyNuxtConfigPatch, createNuxtConfigPatchProposal, createSetupPlan, doctorProject, executeSetupScaffold, listStackTemplates } from '../lib/stack-core.mjs';
+import { applyNuxtConfigPatch, createNuxtConfigPatchProposal, createSetupPlan, doctorProject, executeSetupDependencies, executeSetupScaffold, listStackTemplates } from '../lib/stack-core.mjs';
 
 function parse(argv) {
   const options = parseArgs(argv, {
@@ -318,7 +318,20 @@ async function setupApplyCommand(options) {
   if (!isInteractive(options)) throw new MawaError('Setup execution requires an interactive terminal for explicit recipe approval.', 'INTERACTIVE_REQUIRED');
   const scaffoldEvidence = resolve(root, '.mawa', 'setup', 'scaffold-execution.json');
   const patchProposal = resolve(root, '.mawa', 'setup', 'nuxt-config-proposal.json');
+  const patchApplication = resolve(root, '.mawa', 'setup', 'nuxt-config-application.json');
+  const dependenciesEvidence = resolve(root, '.mawa', 'setup', 'dependencies-execution.json');
   intro('MAWA — aplicar setup aprovado');
+  if (existsSync(dependenciesEvidence)) return outro('A receita de dependências já foi executada. As validações reais são o próximo passo.');
+  if (existsSync(patchApplication)) {
+    if (!await confirm('Executar a receita de dependências certificadas? Cada comando e resultado será registrado.', false)) return cancel('Instalação cancelada. Nenhum comando foi executado.');
+    const task = spinner();
+    task.start('Instalando dependências certificadas e registrando evidências');
+    const result = executeSetupDependencies(root, { confirmed: true });
+    task.stop('Receita de dependências concluída');
+    log.info(`Comandos executados: ${result.commands}`);
+    log.info(`Evidência: ${result.evidence}`);
+    return outro('Dependências instaladas. As validações reais são o próximo passo.');
+  }
   if (existsSync(scaffoldEvidence) || existsSync(patchProposal)) {
     if (!await confirm('Aplicar o patch Nuxt revisado? O MAWA verificará os hashes antes de alterar o arquivo.', false)) return cancel('Aplicação cancelada. Nenhum arquivo foi alterado.');
     const task = spinner();
