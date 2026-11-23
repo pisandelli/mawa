@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getBriefingProgress, getContext, getNext, getStatus, initProject, replaceRawBriefing, validateCriticalBriefing, validateRawBriefing } from '../lib/project-core.mjs';
-import { createNuxtConfigPatchProposal, createSetupPlan, executeSetupScaffold } from '../lib/stack-core.mjs';
+import { applyNuxtConfigPatch, createNuxtConfigPatchProposal, createSetupPlan, executeSetupScaffold } from '../lib/stack-core.mjs';
 
 function project() {
   const root = mkdtempSync(resolve(tmpdir(), 'mawa-init-'));
@@ -326,6 +326,10 @@ test('records a minimal Nuxt configuration patch proposal without changing the a
     const evidence = JSON.parse(readFileSync(resolve(root, result.evidence), 'utf8'));
     assert.ok(evidence.sourceSha256);
     assert.ok(evidence.proposedSha256);
+    const applied = applyNuxtConfigPatch(root, { confirmed: true });
+    assert.equal(applied.status, 'proposed');
+    assert.match(readFileSync(resolve(root, 'web/nuxt.config.ts'), 'utf8'), /daredash: \{ prefix: 'dd', debug: false \}/);
+    assert.ok(existsSync(resolve(root, applied.evidence)));
   } finally { cleanup(root); }
 });
 

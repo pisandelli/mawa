@@ -7,7 +7,7 @@ import { basename, resolve } from 'node:path';
 import { parseArgs } from 'citty';
 import { cancel, confirm as clackConfirm, intro, isCancel, log, outro, select, spinner, text } from '@clack/prompts';
 import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getBriefingProgress, getContext, getNext, getStatus, initProject, isGitRepository, MawaError, rawBriefingPath, replaceRawBriefing, validateRawBriefing } from '../lib/project-core.mjs';
-import { createNuxtConfigPatchProposal, createSetupPlan, doctorProject, executeSetupScaffold, listStackTemplates } from '../lib/stack-core.mjs';
+import { applyNuxtConfigPatch, createNuxtConfigPatchProposal, createSetupPlan, doctorProject, executeSetupScaffold, listStackTemplates } from '../lib/stack-core.mjs';
 
 function parse(argv) {
   const options = parseArgs(argv, {
@@ -316,7 +316,18 @@ async function setupPatchCommand(options) {
 async function setupApplyCommand(options) {
   const root = resolve(options.root || '.');
   if (!isInteractive(options)) throw new MawaError('Setup execution requires an interactive terminal for explicit recipe approval.', 'INTERACTIVE_REQUIRED');
-  intro('MAWA — executar scaffold aprovado');
+  const scaffoldEvidence = resolve(root, '.mawa', 'setup', 'scaffold-execution.json');
+  const patchProposal = resolve(root, '.mawa', 'setup', 'nuxt-config-proposal.json');
+  intro('MAWA — aplicar setup aprovado');
+  if (existsSync(scaffoldEvidence) || existsSync(patchProposal)) {
+    if (!await confirm('Aplicar o patch Nuxt revisado? O MAWA verificará os hashes antes de alterar o arquivo.', false)) return cancel('Aplicação cancelada. Nenhum arquivo foi alterado.');
+    const task = spinner();
+    task.start('Verificando e aplicando o patch Nuxt revisado');
+    const result = applyNuxtConfigPatch(root, { confirmed: true });
+    task.stop('Patch Nuxt aplicado');
+    log.info(`Evidência: ${result.evidence}`);
+    return outro('O patch foi aplicado. A instalação das dependências certificadas é o próximo passo.');
+  }
   if (!await confirm('Executar a receita scaffold-nuxt-minimal? Ela criará a aplicação no diretório aprovado.', false)) return cancel('Execução cancelada. Nenhum comando foi executado.');
   const task = spinner();
   task.start('Executando scaffold certificado e registrando evidências');

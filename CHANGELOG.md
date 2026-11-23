@@ -10,3 +10,4 @@
   setup plans.
 - Added explicitly confirmed execution of the certified Nuxt scaffold recipe, with
   captured command output and an automatic follow-up patch proposal.
+- Added hash-verified application of reviewed Nuxt configuration patch proposals.
