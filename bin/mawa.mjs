@@ -7,7 +7,7 @@ import { basename, resolve } from 'node:path';
 import { parseArgs } from 'citty';
 import { cancel, confirm as clackConfirm, intro, isCancel, log, outro, select, spinner, text } from '@clack/prompts';
 import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getBriefingProgress, getContext, getNext, getStatus, initProject, isGitRepository, MawaError, rawBriefingPath, replaceRawBriefing, validateRawBriefing } from '../lib/project-core.mjs';
-import { createNuxtConfigPatchProposal, createSetupPlan, doctorProject, listStackTemplates } from '../lib/stack-core.mjs';
+import { createNuxtConfigPatchProposal, createSetupPlan, doctorProject, executeSetupScaffold, listStackTemplates } from '../lib/stack-core.mjs';
 
 function parse(argv) {
   const options = parseArgs(argv, {
@@ -20,7 +20,7 @@ function parse(argv) {
 }
 
 function usage() {
-  console.log(`MAWA — MAWA Advances Work Accountably\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa briefing\n  mawa context [--json]\n  mawa handoff [--start-codex]\n  mawa approve [--comment TEXT] [--start-codex]\n  mawa abort\n  mawa doctor [--stack ID] [--app-root PATH]\n  mawa setup [--stack ID] [--app-root PATH] [--template-language pug|html]\n  mawa setup patch\n  mawa stack list\n  mawa audit\n\nUse --json for machine-readable output.\n`);
+  console.log(`MAWA — MAWA Advances Work Accountably\n\nCommands:\n  mawa init [directory]\n  mawa intake\n  mawa status\n  mawa next\n  mawa briefing\n  mawa context [--json]\n  mawa handoff [--start-codex]\n  mawa approve [--comment TEXT] [--start-codex]\n  mawa abort\n  mawa doctor [--stack ID] [--app-root PATH]\n  mawa setup [--stack ID] [--app-root PATH] [--template-language pug|html]\n  mawa setup patch\n  mawa setup apply\n  mawa stack list\n  mawa audit\n\nUse --json for machine-readable output.\n`);
 }
 
 function askInterface() { return createInterface({ input: stdin, output: stdout }); }
@@ -313,6 +313,20 @@ async function setupPatchCommand(options) {
   console.log(JSON.stringify(result, null, 2));
 }
 
+async function setupApplyCommand(options) {
+  const root = resolve(options.root || '.');
+  if (!isInteractive(options)) throw new MawaError('Setup execution requires an interactive terminal for explicit recipe approval.', 'INTERACTIVE_REQUIRED');
+  intro('MAWA — executar scaffold aprovado');
+  if (!await confirm('Executar a receita scaffold-nuxt-minimal? Ela criará a aplicação no diretório aprovado.', false)) return cancel('Execução cancelada. Nenhum comando foi executado.');
+  const task = spinner();
+  task.start('Executando scaffold certificado e registrando evidências');
+  const result = executeSetupScaffold(root, { confirmed: true });
+  task.stop('Scaffold concluído');
+  log.info(`Evidência: ${result.evidence}`);
+  log.info(`Proposta de patch: ${result.patch.proposal}`);
+  return outro('Revise a proposta de patch. Dependências e alterações de configuração continuam bloqueadas até a próxima confirmação.');
+}
+
 export async function runCli(argv = process.argv.slice(2)) {
   const { positionals, options } = parse(argv);
   const command = positionals[0];
@@ -344,6 +358,7 @@ export async function runCli(argv = process.argv.slice(2)) {
   if (command === 'approve') return approveCommand(options);
   if (command === 'abort') return abortCommand(options);
   if (command === 'setup' && positionals[1] === 'patch') return setupPatchCommand(options);
+  if (command === 'setup' && positionals[1] === 'apply') return setupApplyCommand(options);
   if (command === 'setup') return setupCommand(options);
   if (command === 'stack' && positionals[1] === 'list') {
     const stacks = listStackTemplates();
