@@ -13,3 +13,5 @@
 - Added hash-verified application of reviewed Nuxt configuration patch proposals.
 - Added explicitly confirmed installation of the frozen dependency recipe, including
   conditional Pug tooling and per-command evidence.
+- Added confirmed setup validations and a minimal landing page when the selected Nuxt
+  application has no route entry point.

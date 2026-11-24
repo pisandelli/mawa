@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getBriefingProgress, getContext, getNext, getStatus, initProject, replaceRawBriefing, validateCriticalBriefing, validateRawBriefing } from '../lib/project-core.mjs';
-import { applyNuxtConfigPatch, createNuxtConfigPatchProposal, createSetupPlan, executeSetupDependencies, executeSetupScaffold } from '../lib/stack-core.mjs';
+import { applyNuxtConfigPatch, createNuxtConfigPatchProposal, createSetupPlan, executeSetupDependencies, executeSetupScaffold, executeSetupValidations } from '../lib/stack-core.mjs';
 
 function project() {
   const root = mkdtempSync(resolve(tmpdir(), 'mawa-init-'));
@@ -342,6 +342,10 @@ test('records a minimal Nuxt configuration patch proposal without changing the a
     assert.equal(dependencyCommands.length, 4);
     assert.ok(dependencyCommands.every((command) => command.executable === 'pnpm' && command.cwd === resolve(root, 'web')));
     assert.ok(existsSync(resolve(root, dependencies.evidence)));
+    const validation = executeSetupValidations(root, { confirmed: true, runner: () => ({ status: 0, stdout: 'passed', stderr: '' }) });
+    assert.equal(validation.commands, 2);
+    assert.match(readFileSync(resolve(root, validation.landing), 'utf8'), /template lang="pug"/);
+    assert.ok(existsSync(resolve(root, validation.evidence)));
   } finally { cleanup(root); }
 });
 

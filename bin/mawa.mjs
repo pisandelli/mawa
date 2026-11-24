@@ -7,7 +7,7 @@ import { basename, resolve } from 'node:path';
 import { parseArgs } from 'citty';
 import { cancel, confirm as clackConfirm, intro, isCancel, log, outro, select, spinner, text } from '@clack/prompts';
 import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getBriefingProgress, getContext, getNext, getStatus, initProject, isGitRepository, MawaError, rawBriefingPath, replaceRawBriefing, validateRawBriefing } from '../lib/project-core.mjs';
-import { applyNuxtConfigPatch, createNuxtConfigPatchProposal, createSetupPlan, doctorProject, executeSetupDependencies, executeSetupScaffold, listStackTemplates } from '../lib/stack-core.mjs';
+import { applyNuxtConfigPatch, createNuxtConfigPatchProposal, createSetupPlan, doctorProject, executeSetupDependencies, executeSetupScaffold, executeSetupValidations, listStackTemplates } from '../lib/stack-core.mjs';
 
 function parse(argv) {
   const options = parseArgs(argv, {
@@ -320,8 +320,19 @@ async function setupApplyCommand(options) {
   const patchProposal = resolve(root, '.mawa', 'setup', 'nuxt-config-proposal.json');
   const patchApplication = resolve(root, '.mawa', 'setup', 'nuxt-config-application.json');
   const dependenciesEvidence = resolve(root, '.mawa', 'setup', 'dependencies-execution.json');
+  const validationEvidence = resolve(root, '.mawa', 'setup', 'validation-execution.json');
   intro('MAWA — aplicar setup aprovado');
-  if (existsSync(dependenciesEvidence)) return outro('A receita de dependências já foi executada. As validações reais são o próximo passo.');
+  if (existsSync(validationEvidence)) return outro('As validações já foram registradas. A verificação HTTP da rota e o gate final de setup são o próximo passo.');
+  if (existsSync(dependenciesEvidence)) {
+    if (!await confirm('Executar typecheck, lint e testes disponíveis? A landing mínima será criada se estiver ausente.', false)) return cancel('Validação cancelada. Nenhum comando foi executado.');
+    const task = spinner();
+    task.start('Executando validações e registrando evidências');
+    const result = executeSetupValidations(root, { confirmed: true });
+    task.stop('Validações concluídas');
+    log.info(`Comandos executados: ${result.commands}`);
+    log.info(`Landing: ${result.landing}`);
+    return outro('Validações registradas. A verificação HTTP da rota e o gate final são o próximo passo.');
+  }
   if (existsSync(patchApplication)) {
     if (!await confirm('Executar a receita de dependências certificadas? Cada comando e resultado será registrado.', false)) return cancel('Instalação cancelada. Nenhum comando foi executado.');
     const task = spinner();
