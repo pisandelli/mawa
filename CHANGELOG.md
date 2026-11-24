@@ -15,3 +15,4 @@
   conditional Pug tooling and per-command evidence.
 - Added confirmed setup validations and a minimal landing page when the selected Nuxt
   application has no route entry point.
+- Added controlled Nuxt startup and HTTP 200 verification for the root route.

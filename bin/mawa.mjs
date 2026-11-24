@@ -7,7 +7,7 @@ import { basename, resolve } from 'node:path';
 import { parseArgs } from 'citty';
 import { cancel, confirm as clackConfirm, intro, isCancel, log, outro, select, spinner, text } from '@clack/prompts';
 import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getBriefingProgress, getContext, getNext, getStatus, initProject, isGitRepository, MawaError, rawBriefingPath, replaceRawBriefing, validateRawBriefing } from '../lib/project-core.mjs';
-import { applyNuxtConfigPatch, createNuxtConfigPatchProposal, createSetupPlan, doctorProject, executeSetupDependencies, executeSetupScaffold, executeSetupValidations, listStackTemplates } from '../lib/stack-core.mjs';
+import { applyNuxtConfigPatch, createNuxtConfigPatchProposal, createSetupPlan, doctorProject, executeSetupDependencies, executeSetupScaffold, executeSetupValidations, listStackTemplates, verifySetupRoute } from '../lib/stack-core.mjs';
 
 function parse(argv) {
   const options = parseArgs(argv, {
@@ -321,8 +321,17 @@ async function setupApplyCommand(options) {
   const patchApplication = resolve(root, '.mawa', 'setup', 'nuxt-config-application.json');
   const dependenciesEvidence = resolve(root, '.mawa', 'setup', 'dependencies-execution.json');
   const validationEvidence = resolve(root, '.mawa', 'setup', 'validation-execution.json');
+  const routeEvidence = resolve(root, '.mawa', 'setup', 'route-verification.json');
   intro('MAWA — aplicar setup aprovado');
-  if (existsSync(validationEvidence)) return outro('As validações já foram registradas. A verificação HTTP da rota e o gate final de setup são o próximo passo.');
+  if (existsSync(routeEvidence)) return outro('A rota já foi verificada. O gate humano final de setup é o próximo passo.');
+  if (existsSync(validationEvidence)) {
+    if (!await confirm('Iniciar Nuxt temporariamente e verificar HTTP 200 na rota /?', false)) return cancel('Verificação cancelada. Nenhum servidor foi iniciado.');
+    const task = spinner();
+    task.start('Verificando a rota / em um servidor Nuxt temporário');
+    const result = await verifySetupRoute(root, { confirmed: true });
+    task.stop('Rota verificada');
+    return outro(`HTTP ${result.status} registrado em ${result.evidence}. O gate final de setup é o próximo passo.`);
+  }
   if (existsSync(dependenciesEvidence)) {
     if (!await confirm('Executar typecheck, lint e testes disponíveis? A landing mínima será criada se estiver ausente.', false)) return cancel('Validação cancelada. Nenhum comando foi executado.');
     const task = spinner();

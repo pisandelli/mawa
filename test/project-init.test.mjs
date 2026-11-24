@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
 import { abortInitialization, approveCurrentGate, auditProject, getAgentHandoff, getBriefingProgress, getContext, getNext, getStatus, initProject, replaceRawBriefing, validateCriticalBriefing, validateRawBriefing } from '../lib/project-core.mjs';
-import { applyNuxtConfigPatch, createNuxtConfigPatchProposal, createSetupPlan, executeSetupDependencies, executeSetupScaffold, executeSetupValidations } from '../lib/stack-core.mjs';
+import { applyNuxtConfigPatch, createNuxtConfigPatchProposal, createSetupPlan, executeSetupDependencies, executeSetupScaffold, executeSetupValidations, verifySetupRoute } from '../lib/stack-core.mjs';
 
 function project() {
   const root = mkdtempSync(resolve(tmpdir(), 'mawa-init-'));
@@ -304,7 +304,7 @@ test('blocks a setup plan whose Nuxt configuration cannot be safely patched', ()
   } finally { cleanup(root); }
 });
 
-test('records a minimal Nuxt configuration patch proposal without changing the app', () => {
+test('records a minimal Nuxt configuration patch proposal without changing the app', async () => {
   const root = project();
   try {
     initProject(root);
@@ -346,6 +346,9 @@ test('records a minimal Nuxt configuration patch proposal without changing the a
     assert.equal(validation.commands, 2);
     assert.match(readFileSync(resolve(root, validation.landing), 'utf8'), /template lang="pug"/);
     assert.ok(existsSync(resolve(root, validation.evidence)));
+    const route = await verifySetupRoute(root, { confirmed: true, port: 39999, serverFactory: () => ({ kill: () => {} }), request: async () => 200 });
+    assert.equal(route.status, 200);
+    assert.ok(existsSync(resolve(root, route.evidence)));
   } finally { cleanup(root); }
 });
 
